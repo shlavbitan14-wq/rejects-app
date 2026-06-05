@@ -67,9 +67,11 @@
           <span id="vr-rpt" style="font-weight:600;color:var(--text);"></span>
           <span class="sep">·</span><span id="vr-type" style="font-size:11px;color:var(--muted)"></span>
         </div>
-        <button class="btn btn-o btn-sm" onclick="saveRptFile()">💾 שמור קובץ</button>
-        <button class="btn btn-o btn-sm" onclick="openSaveTpl()">⭐ שמור כטמפלייט</button>
-        <button class="btn btn-p btn-sm" onclick="doPDF()">📄 ייצוא PDF</button>
+        <div class="r-actions">
+          <button class="btn btn-o btn-sm" onclick="saveRptFile()">💾 שמור קובץ</button>
+          <button class="btn btn-o btn-sm" onclick="openSaveTpl()">⭐ שמור כטמפלייט</button>
+          <button class="btn btn-p btn-sm" onclick="doPDF()">📄 ייצוא PDF</button>
+        </div>
       </div>
 
       <div class="r-workspace">
@@ -126,6 +128,11 @@
             </div>
           </div>
         </div>
+      </div>
+      <div class="mobile-actionbar mobile-only no-print">
+        <button onclick="saveRptFile()"><span class="mi">💾</span><span>קובץ</span></button>
+        <button onclick="openSaveTpl()"><span class="mi">⭐</span><span>טמפלייט</span></button>
+        <button class="primary" onclick="doPDF()"><span class="mi">📄</span><span>ייצוא PDF</span></button>
       </div>
     </div>
 
