@@ -1,0 +1,43 @@
+{
+  "name": "rejects-qc",
+  "version": "1.0.0",
+  "description": "מערכת דוחות רג'קטים לבקרת בנייה",
+  "main": "src/main.js",
+  "author": "Construction QC",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder --win",
+    "build:portable": "electron-builder --win portable",
+    "dist": "electron-builder",
+    "sync:web": "node scripts/sync-web.js"
+  },
+  "devDependencies": {
+    "electron": "^31.0.0",
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "appId": "com.qc.rejects",
+    "productName": "RejectsQC",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "src/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": [
+        { "target": "nsis", "arch": ["x64"] }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "דוחות רג'קטים"
+    }
+  }
+}

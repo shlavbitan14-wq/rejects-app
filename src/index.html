@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: blob:; media-src 'self' data: blob:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; font-src 'self'; connect-src 'none'; object-src 'none'; frame-src 'none'; base-uri 'none'; form-action 'none'">
+<title>מערכת דוחות מקצועית — בנייה וחשמל</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div id="app">
+
+  <!-- SIDEBAR -->
+  <aside id="sb">
+    <div class="sb-head">
+      <div class="sb-logo">דוחות <em>מקצועיים</em></div>
+      <div class="sb-sub">בקרת בנייה · ייעוץ חשמל</div>
+    </div>
+    <div class="sb-nav">
+      <div class="sb-sec">תפריט</div>
+      <div class="nav-i on" id="nav-home" onclick="goHome()"><span class="ico">🏠</span><span>פרויקטים</span></div>
+    </div>
+    <div class="sb-sec" style="padding:6px 16px 3px;">פרויקטים</div>
+    <div class="sb-projs" id="sb-projs"></div>
+    <div class="sb-foot" id="sb-foot">v3.0</div>
+  </aside>
+  <div id="drawer-bd" onclick="closeDrawers()"></div>
+
+  <!-- MAIN -->
+  <div id="main">
+
+    <!-- VIEW: HOME -->
+    <div class="view on" id="vh">
+      <div class="topbar">
+        <button class="btn btn-g btn-ic mobile-only" onclick="toggleSidebar()" title="תפריט">☰</button>
+        <div class="tb-title">פרויקטים</div>
+        <button class="btn btn-o btn-sm" onclick="importReport()">📂 פתיחת דוח</button>
+        <button class="btn btn-o btn-sm" onclick="importTplFile()">⬇️ ייבוא טמפלייט</button>
+        <button class="btn btn-p btn-sm" onclick="openProjModal()">＋ פרויקט חדש</button>
+      </div>
+      <div class="content" id="home-c"></div>
+    </div>
+
+    <!-- VIEW: PROJECT -->
+    <div class="view" id="vp">
+      <div class="topbar">
+        <button class="btn btn-g btn-ic mobile-only" onclick="toggleSidebar()" title="תפריט">☰</button>
+        <div class="breadcrumb">
+          <span class="crumb" onclick="goHome()">פרויקטים</span><span class="sep">›</span>
+          <span id="vp-name" style="font-weight:600;color:var(--text);"></span>
+        </div>
+        <button class="btn btn-g btn-sm" onclick="editCurProj()" style="color:var(--muted)">✏️ עריכה</button>
+        <button class="btn btn-g btn-sm" style="color:var(--err)" onclick="delCurProj()">🗑️ מחק</button>
+        <button class="btn btn-p btn-sm" onclick="newReport()">＋ דוח חדש</button>
+      </div>
+      <div class="content" id="proj-c"></div>
+    </div>
+
+    <!-- VIEW: REPORT EDITOR -->
+    <div class="view" id="vr">
+      <div class="r-toolbar no-print">
+        <button class="btn btn-g btn-ic mobile-only" onclick="toggleSidebar()" title="תפריט">☰</button>
+        <button class="btn btn-o btn-sm mobile-only" onclick="togglePanel()" title="עיצוב ובלוקים">⚙️ עיצוב</button>
+        <div class="breadcrumb" style="flex:1">
+          <span class="crumb" onclick="goHome()">פרויקטים</span><span class="sep">›</span>
+          <span class="crumb" id="vr-proj" onclick="goCurProj()"></span><span class="sep">›</span>
+          <span id="vr-rpt" style="font-weight:600;color:var(--text);"></span>
+          <span class="sep">·</span><span id="vr-type" style="font-size:11px;color:var(--muted)"></span>
+        </div>
+        <button class="btn btn-o btn-sm" onclick="saveRptFile()">💾 שמור קובץ</button>
+        <button class="btn btn-o btn-sm" onclick="openSaveTpl()">⭐ שמור כטמפלייט</button>
+        <button class="btn btn-p btn-sm" onclick="doPDF()">📄 ייצוא PDF</button>
+      </div>
+
+      <div class="r-workspace">
+        <!-- Design / structure panel -->
+        <aside class="r-panel no-print" id="rPanel">
+          <h4>מיתוג ולוגו</h4>
+          <div class="fld">
+            <button class="btn btn-o btn-sm" style="width:100%" onclick="document.getElementById('logoInput').click()">📁 העלאת לוגו</button>
+            <div class="logo-prev" id="logoPrev"><span class="ph">אין לוגו</span></div>
+          </div>
+          <div class="fld"><label>טקסט לוגו</label><input type="text" id="logoText" oninput="applyBranding()"></div>
+          <div class="fld"><label>כיתוב משנה</label><input type="text" id="logoSub" oninput="applyBranding()"></div>
+
+          <h4>פרטי החברה / עורך</h4>
+          <div class="fld"><label>שם חברה</label><input type="text" id="coName" oninput="applyBranding()"></div>
+          <div class="fld"><label>טלפון</label><input type="tel" id="coPhone" oninput="applyBranding()"></div>
+          <div class="fld"><label>עורך הדוח / בודק</label><input type="text" id="coInsp" oninput="applyBranding()"></div>
+          <div class="fld"><label>מס׳ רישיון / תעודה</label><input type="text" id="coLicense" oninput="applyBranding()"></div>
+
+          <h4>פלטת צבעים</h4>
+          <div class="pal-row" id="pal-row"></div>
+
+          <h4>הוספת בלוק</h4>
+          <div style="display:flex;flex-wrap:wrap;gap:5px;">
+            <button class="btn-add" onclick="addBlock('heading')">כותרת</button>
+            <button class="btn-add" onclick="addBlock('text')">טקסט</button>
+            <button class="btn-add" onclick="addBlock('meta')">פרטי זיהוי</button>
+            <button class="btn-add" onclick="addBlock('defects')">רג׳קטים</button>
+            <button class="btn-add" onclick="addBlock('measure')">מדידות</button>
+            <button class="btn-add" onclick="addBlock('checklist')">בדיקה</button>
+            <button class="btn-add" onclick="addBlock('boq')">כתב כמויות</button>
+            <button class="btn-add" onclick="addBlock('loadcalc')">עומסים</button>
+            <button class="btn-add" onclick="addBlock('thermo')">תרמוגרפיה</button>
+            <button class="btn-add" onclick="addBlock('summary')">סיכום</button>
+            <button class="btn-add" onclick="addBlock('legal')">הצהרה</button>
+            <button class="btn-add" onclick="addBlock('signatures')">חתימות</button>
+          </div>
+          <div style="font-size:10.5px;color:var(--muted);margin-top:8px;line-height:1.5">
+            רחף מעל בלוק כדי להזיז/למחוק. כל שדה ניתן לעריכה ישירה במסמך.
+          </div>
+        </aside>
+
+        <!-- Sheet -->
+        <div class="r-scroll">
+          <div class="sheet" id="sheet">
+            <div class="doc-head">
+              <div class="meta-grid" id="headMeta"></div>
+              <div class="logo-block" id="logoBlock"></div>
+            </div>
+            <div id="blocks"></div>
+            <div class="doc-foot">
+              <div>הופק ע״י <span id="foot-firm">שם החברה</span></div>
+              <div>מסמך מס׳ <span contenteditable id="doc-num">001</span> · גרסה <span contenteditable id="doc-rev">1.0</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /main -->
+</div><!-- /app -->
+
+<!-- MODAL: project -->
+<div class="overlay" id="mProj">
+  <div class="modal">
+    <div class="modal-h"><span id="mProj-title">פרויקט חדש</span><button class="modal-x" onclick="closeM('mProj')">✕</button></div>
+    <div class="modal-b">
+      <div class="fld"><label>שם הפרויקט *</label><input type="text" id="pi-name" placeholder="שם האתר / הפרויקט"></div>
+      <div class="fld"><label>כתובת</label><input type="text" id="pi-addr" placeholder="רחוב, עיר"></div>
+      <div class="fld"><label>לקוח / קבלן</label><input type="text" id="pi-clt" placeholder="שם החברה"></div>
+    </div>
+    <div class="modal-f"><button class="btn btn-o" onclick="closeM('mProj')">ביטול</button><button class="btn btn-p" onclick="saveProj()">שמור</button></div>
+  </div>
+</div>
+
+<!-- MODAL: template gallery -->
+<div class="overlay" id="mGallery">
+  <div class="modal wide">
+    <div class="modal-h"><span>בחירת סוג דוח וטמפלייט</span><button class="modal-x" onclick="closeM('mGallery')">✕</button></div>
+    <div class="modal-b">
+      <div class="gal-cats">
+        <div class="gal-cat on" data-cat="build" onclick="galCat('build')">🏗️ בנייה</div>
+        <div class="gal-cat" data-cat="elec" onclick="galCat('elec')">⚡ חשמל</div>
+      </div>
+      <div class="gal-types" id="gal-types"></div>
+      <div id="gal-tpls-wrap" style="display:none">
+        <h4 style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin:14px 0 8px;border-top:1px solid var(--border);padding-top:12px;">טמפלייטים</h4>
+        <div class="gal-tpls" id="gal-tpls"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: save as template -->
+<div class="overlay" id="mTpl">
+  <div class="modal">
+    <div class="modal-h"><span>שמירת טמפלייט מותאם</span><button class="modal-x" onclick="closeM('mTpl')">✕</button></div>
+    <div class="modal-b">
+      <div class="fld"><label>שם הטמפלייט *</label><input type="text" id="ti-name"></div>
+      <div class="fld"><label>תיאור</label><input type="text" id="ti-desc" placeholder="למה משמש הטמפלייט"></div>
+      <label style="display:flex;align-items:center;gap:7px;font-size:12.5px;color:#444;margin-top:4px;">
+        <input type="checkbox" id="ti-export"> ייצא גם לקובץ ‎.qctpl‎ (להעברה בין מחשבים)
+      </label>
+    </div>
+    <div class="modal-f"><button class="btn btn-o" onclick="closeM('mTpl')">ביטול</button><button class="btn btn-p" onclick="saveTplConfirm()">שמור טמפלייט</button></div>
+  </div>
+</div>
+
+<!-- MODAL: signature -->
+<div class="overlay" id="mSig">
+  <div class="modal" style="width:510px">
+    <div class="modal-h"><span id="mSig-title">חתימה</span><button class="modal-x" onclick="closeM('mSig')">✕</button></div>
+    <div class="modal-b" style="padding:14px">
+      <div style="font-size:12px;color:var(--muted);margin-bottom:7px;">חתום כאן (בעכבר או בעט):</div>
+      <div style="border:2px solid var(--border);border-radius:8px;background:#fff;overflow:hidden;">
+        <canvas id="sigCanvas" width="474" height="195" style="display:block;cursor:crosshair;"></canvas>
+      </div>
+      <div style="margin-top:8px;display:flex;align-items:center;gap:8px;">
+        <button class="btn btn-o btn-sm" onclick="clearSigPad()">🗑️ נקה</button>
+        <input type="text" id="sigName" placeholder="שם החותם (אופציונלי)" style="flex:1;padding:6px 9px;border:1px solid var(--border);border-radius:6px;font-family:inherit;font-size:12.5px;outline:none;">
+      </div>
+    </div>
+    <div class="modal-f"><button class="btn btn-o" onclick="closeM('mSig')">ביטול</button><button class="btn btn-p" onclick="applySig()">✔ אשר חתימה</button></div>
+  </div>
+</div>
+
+<div class="toasts" id="toasts"></div>
+<input type="file" id="logoInput" accept="image/*" style="display:none">
+<input type="file" id="photoInput" accept="image/*" style="display:none">
+
+<script src="data/domain.js"></script>
+<script src="blocks.js"></script>
+<script src="data/reportTypes.js"></script>
+<script src="data/templates.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
