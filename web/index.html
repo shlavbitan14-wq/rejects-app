@@ -3,9 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: blob:; media-src 'self' data: blob:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; font-src 'self'; connect-src 'none'; object-src 'none'; frame-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: blob: https://jwhtujgfzqebfckcxdqt.supabase.co; media-src 'self' data: blob:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; font-src 'self'; connect-src 'self' https://jwhtujgfzqebfckcxdqt.supabase.co wss://jwhtujgfzqebfckcxdqt.supabase.co; object-src 'none'; frame-src 'none'; base-uri 'none'; form-action 'none'">
 <title>מערכת דוחות מקצועית — בנייה וחשמל</title>
 <link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="auth.css">
 </head>
 <body>
 <div id="app">
@@ -22,6 +23,7 @@
     </div>
     <div class="sb-sec" style="padding:6px 16px 3px;">פרויקטים</div>
     <div class="sb-projs" id="sb-projs"></div>
+    <div class="sb-user" id="sb-user"></div>
     <div class="sb-foot" id="sb-foot">v3.0</div>
   </aside>
   <div id="drawer-bd" onclick="closeDrawers()"></div>
@@ -226,6 +228,12 @@
 <input type="file" id="logoInput" accept="image/*" style="display:none">
 <input type="file" id="photoInput" accept="image/*" style="display:none">
 
+<input type="file" id="rejectFileInput" accept="image/*,.pdf" style="display:none">
+
+<script src="vendor/supabase.js"></script>
+<script src="supabase-config.js"></script>
+<script src="cloud.js"></script>
+<script src="auth.js"></script>
 <script src="data/domain.js"></script>
 <script src="blocks.js"></script>
 <script src="data/reportTypes.js"></script>

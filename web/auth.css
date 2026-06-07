@@ -1,0 +1,82 @@
+/* =====================================================================
+ * auth.css — שער התחברות, צ'יפ משתמש, וקבצים מצורפים לרג'קט.
+ * ===================================================================== */
+
+/* ===== שער התחברות ===== */
+#authGate{
+  position:fixed;inset:0;z-index:9999;display:none;align-items:center;justify-content:center;
+  background:radial-gradient(120% 120% at 50% 0%,#fbfbfd 0%,#eef0f4 60%,#e7e9ef 100%);
+  padding:24px;direction:rtl;
+}
+#authGate.on{display:flex;animation:authIn .35s var(--ease);}
+@keyframes authIn{from{opacity:0}to{opacity:1}}
+.auth-card{
+  width:100%;max-width:380px;background:var(--card);border:1px solid var(--hair);
+  border-radius:22px;box-shadow:var(--sh-3);padding:32px 28px;
+}
+.auth-brand{font-size:21px;font-weight:700;letter-spacing:-.02em;text-align:center;}
+.auth-brand em{color:var(--accent-ui);font-style:normal;}
+.auth-sub{font-size:14px;color:var(--muted);text-align:center;margin:6px 0 20px;}
+.auth-note{font-size:12.5px;color:var(--muted);line-height:1.6;margin-bottom:16px;text-align:center;}
+.auth-fld{display:block;margin-bottom:13px;}
+.auth-fld span{display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:5px;}
+.auth-fld input{
+  width:100%;padding:11px 13px;border:1px solid var(--border);border-radius:11px;
+  font-family:inherit;font-size:14px;background:var(--fill2);outline:none;transition:.15s;
+}
+.auth-fld input:focus{border-color:var(--accent-ui);background:#fff;box-shadow:var(--ring);}
+.auth-btn{
+  width:100%;margin-top:8px;padding:12px;border:none;border-radius:11px;cursor:pointer;
+  background:var(--accent-ui);color:#fff;font-family:inherit;font-size:14.5px;font-weight:600;
+  transition:transform .12s var(--ease),background .15s;
+}
+.auth-btn:hover{background:var(--accent-ui2);}
+.auth-btn:active{transform:scale(.98);}
+.auth-btn:disabled{opacity:.6;cursor:default;}
+.auth-swap{text-align:center;font-size:13px;color:var(--muted);margin-top:16px;}
+.auth-swap a{color:var(--accent-ui);cursor:pointer;font-weight:600;}
+.auth-swap a:hover{text-decoration:underline;}
+.auth-err{
+  display:none;background:rgba(215,0,21,.08);color:var(--err);border:1px solid rgba(215,0,21,.2);
+  border-radius:10px;padding:9px 12px;font-size:12.5px;margin-bottom:14px;text-align:center;
+}
+
+/* ===== צ'יפ משתמש בסרגל הצד ===== */
+.sb-user{display:flex;align-items:center;gap:9px;padding:10px 14px;border-top:1px solid var(--hair);}
+.sb-user:empty{display:none;}
+.user-av{
+  width:30px;height:30px;border-radius:50%;flex-shrink:0;background:var(--accent-ui);color:#fff;
+  display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;
+}
+.user-info{flex:1;min-width:0;}
+.user-name{font-size:12.5px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.user-role{font-size:10.5px;color:var(--faint);}
+.user-out{
+  border:none;background:transparent;cursor:pointer;font-size:15px;color:var(--muted);
+  padding:4px 6px;border-radius:7px;transition:.15s;
+}
+.user-out:hover{background:rgba(0,0,0,.06);color:var(--err);}
+
+/* ===== קבצים מצורפים לרג'קט (שרטוטים / תוכניות) ===== */
+.files-row{margin:8px 0 4px;}
+.files-label{font-size:11px;font-weight:600;color:var(--g3);margin-bottom:5px;}
+.files-list{display:flex;flex-wrap:wrap;gap:7px;}
+.file-chip{
+  display:inline-flex;align-items:center;gap:5px;background:var(--g1);border:1px solid var(--g2);
+  border-radius:8px;padding:3px 4px 3px 7px;max-width:200px;
+}
+.file-chip a{display:inline-flex;align-items:center;gap:6px;text-decoration:none;color:var(--ink);min-width:0;}
+.file-chip img{width:30px;height:30px;object-fit:cover;border-radius:5px;flex-shrink:0;border:1px solid var(--g2);}
+.file-ico{font-size:18px;width:30px;text-align:center;flex-shrink:0;}
+.file-name{font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.file-x{
+  border:none;background:transparent;cursor:pointer;color:var(--muted);font-size:11px;
+  padding:2px 4px;border-radius:5px;flex-shrink:0;
+}
+.file-x:hover{background:rgba(0,0,0,.07);color:var(--d-err);}
+.file-chip.loading{font-size:11px;color:var(--muted);padding:6px 10px;}
+.files-add{margin-top:7px;}
+@media print{
+  .files-add,.file-x{display:none!important;}
+  .file-chip{border-color:#ccc;}
+}

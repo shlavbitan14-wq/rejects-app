@@ -42,6 +42,24 @@
   }
   function imgSrc(el, q) { const im = el.querySelector(q + ' img'); return im ? im.src : null; }
 
+  // ---------- קבצים מצורפים (שרטוטים / תוכניות) ----------
+  function fileChip(f, i) {
+    const isImg = /^image\//.test(f.type || '') || /\.(png|jpe?g|gif|webp)$/i.test(f.url || '');
+    const thumb = isImg ? `<img src="${esc(f.url)}" alt="">` : `<span class="file-ico">📄</span>`;
+    return `<span class="file-chip">
+      <a href="${esc(f.url)}" target="_blank" rel="noopener" title="${esc(f.name)}">${thumb}<span class="file-name">${esc(f.name)}</span></a>
+      <button class="file-x no-print" data-i="${i}" onclick="removeRejectFile(this)" title="הסר">✕</button></span>`;
+  }
+  function renderFileChips(arr) { return (arr || []).map(fileChip).join(''); }
+  function filesRow(files) {
+    return `<div class="files-row no-print-faint" data-files="${esc(JSON.stringify(files || []))}">
+      <div class="files-label">שרטוטים / תוכניות:</div>
+      <div class="files-list">${renderFileChips(files || [])}</div>
+      <button class="btn-add files-add no-print" onclick="pickRejectFile(this)">＋ צרף שרטוט / תוכנית</button></div>`;
+  }
+  function collectFiles(it) { const r = it.querySelector('.files-row'); try { return JSON.parse(r ? r.dataset.files : '[]'); } catch (e) { return []; } }
+  window.renderFileChips = renderFileChips;
+
   // ---------- רישום בלוקים ----------
   const BLOCKS = {};
 
@@ -114,6 +132,7 @@
           <span>אחראי</span>${inp('inp sm f-resp', it.resp, 'קבלן / ספק')}
           <span>יעד לתיקון</span>${inp('inp sm f-due', it.due, 'תאריך')}
         </div>
+        ${filesRow(it.files)}
         <div class="statusbar">
           <span class="sev-tag">חומרה: <b>${esc((D.SEVERITY.find(s => s.key === (it.severity || 'med')) || {}).label || '')}</b></span>
           <span class="badge ${(D.STATUS.find(s => s.key === (it.status || 'open')) || {}).cls}">${esc((D.STATUS.find(s => s.key === (it.status || 'open')) || {}).label || '')}</span>
@@ -141,6 +160,7 @@
         std: ival(it, '.f-std'), tol: ival(it, '.f-tol'), measured: ival(it, '.f-meas'),
         resp: ival(it, '.f-resp'), due: ival(it, '.f-due'),
         severity: ival(it, '.f-sev'), status: ival(it, '.f-status'),
+        files: collectFiles(it),
         photo: imgSrc(it, '.pwrap:nth-child(1) .pbox'), photoAfter: imgSrc(it, '.pwrap:nth-child(2) .pbox')
       }));
       return { items };

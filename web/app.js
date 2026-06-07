@@ -20,16 +20,39 @@ window.getRS = () => RS;
 
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('sb-foot').textContent = 'v3.0 · ' + (IS_EL ? 'Desktop' : 'Web');
-  init();
+  // בדפדפן: שער התחברות תחילה (auth.js יקרא ל-init אחרי כניסה). באלקטרון: ישר.
+  if (!IS_EL && window.AUTH) window.AUTH.start();
+  else init();
 });
 
+// תצוגת המשתמש המחובר בסרגל הצד + כפתור התנתקות
+window.renderUserChip = function (profile) {
+  const el = document.getElementById('sb-user'); if (!el || !profile) return;
+  const roleLbl = profile.role === 'manager' ? 'מנהל' : (profile.role === 'super_admin' ? 'מנהל-על' : 'מהנדס');
+  const initial = (profile.full_name || profile.email || '?').trim().charAt(0).toUpperCase();
+  el.innerHTML = `
+    <div class="user-av">${esc(initial)}</div>
+    <div class="user-info">
+      <div class="user-name">${esc(profile.full_name || profile.email)}</div>
+      <div class="user-role">${esc(roleLbl)}</div>
+    </div>
+    <button class="user-out" title="התנתקות" onclick="AUTH.signOut()">⎋</button>`;
+};
+
 // ===== DB (פרויקטים) =====
+function cloudOn() { return !IS_EL && window.CLOUD && window.CLOUD.ready; }
 async function dbLoad() {
+  if (cloudOn()) {
+    const raw = await window.CLOUD.loadWorkspace();
+    if (raw) { try { const d = JSON.parse(raw); if (d.projects) S.projects = d.projects; } catch (e) {} }
+    return;
+  }
   let raw = IS_EL ? await window.qcAPI.dbRead() : localStorage.getItem('qc_db');
   if (raw) { try { const d = JSON.parse(raw); if (d.projects) S.projects = d.projects; } catch (e) {} }
 }
 async function dbSave() {
   const json = JSON.stringify({ projects: S.projects });
+  if (cloudOn()) { window.CLOUD.saveWorkspace(json); return; }
   if (IS_EL) await window.qcAPI.dbWrite(json);
   else { try { localStorage.setItem('qc_db', json); } catch (e) { toast('שגיאת שמירה: ' + e.message, 'err'); } }
 }
@@ -331,6 +354,8 @@ document.addEventListener('DOMContentLoaded', () => {
     rd.readAsDataURL(f);
   });
   document.getElementById('photoInput').addEventListener('change', onPhotoPicked);
+  const rf = document.getElementById('rejectFileInput');
+  if (rf) rf.addEventListener('change', onRejectFilePicked);
 });
 
 // ===== BLOCKS AREA =====
@@ -526,3 +551,44 @@ async function init() {
   document.getElementById('doc-rev') && document.getElementById('doc-rev').addEventListener('input', schedSave);
   renderSB(); goHome();
 }
+window.init = init;
+
+// ===== קבצים מצורפים לרג'קט (שרטוטים / תוכניות) =====
+let activeFilesRow = null;
+function pickRejectFile(btn) {
+  activeFilesRow = btn.closest('.files-row');
+  const i = document.getElementById('rejectFileInput'); i.value = ''; i.click();
+}
+window.pickRejectFile = pickRejectFile;
+
+function filesOf(row) { try { return JSON.parse(row.dataset.files || '[]'); } catch (e) { return []; } }
+function setFiles(row, arr) {
+  row.dataset.files = JSON.stringify(arr);
+  const list = row.querySelector('.files-list');
+  if (list) list.innerHTML = window.renderFileChips(arr);
+}
+
+async function onRejectFilePicked(e) {
+  const f = e.target.files[0]; const row = activeFilesRow; if (!f || !row) return;
+  const arr = filesOf(row);
+  if (cloudOn()) {
+    const chip = document.createElement('span'); chip.className = 'file-chip loading'; chip.textContent = '⏳ מעלה…';
+    row.querySelector('.files-list').appendChild(chip);
+    try {
+      const meta = await window.CLOUD.uploadAttachment(f);
+      arr.push(meta); setFiles(row, arr); schedSave(); toast('הקובץ הועלה', 'ok');
+    } catch (err) { chip.remove(); toast('שגיאת העלאה: ' + err.message, 'err'); }
+  } else {
+    // לא מחוברים לענן — שמירה מוטמעת (base64) כגיבוי מקומי
+    const rd = new FileReader();
+    rd.onload = ev => { arr.push({ name: f.name, url: ev.target.result, type: f.type || '', size: f.size, path: null }); setFiles(row, arr); schedSave(); };
+    rd.readAsDataURL(f);
+  }
+}
+
+window.removeRejectFile = function (btn) {
+  const row = btn.closest('.files-row'); const i = +btn.dataset.i;
+  const arr = filesOf(row); const removed = arr.splice(i, 1)[0];
+  if (removed && removed.path && cloudOn()) window.CLOUD.deleteAttachment(removed.path);
+  setFiles(row, arr); schedSave();
+};
