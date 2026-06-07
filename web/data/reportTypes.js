@@ -199,6 +199,18 @@
         mk('thermo', { items: [{}] }),
         sigs([{ key: 'inspector', label: 'חתימת הבודק' }])
       ]
+    },
+
+    /* ===================== מסמך מאפס ===================== */
+    {
+      id: 'custom', category: 'custom', name: 'מסמך מאפס', icon: '✨', palette: 'navySteel',
+      desc: 'התחל ממסמך ריק והוסף כל בלוק שתרצה',
+      blocks: () => [
+        meta([{ label: 'נושא', value: '' }, { label: 'תאריך', value: '' }, { label: 'נערך ע"י', value: '' }]),
+        heading('כותרת ראשית'),
+        text(''),
+        sigs([{ key: 'sig1', label: 'חתימה' }])
+      ]
     }
   ];
 

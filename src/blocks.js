@@ -489,6 +489,130 @@
   window.recalcBoq = function (node) { const t = node.closest('table'); if (t) recalcBoqEl(t); };
   window.recalcAllBoq = function () { document.querySelectorAll('table.boq').forEach(recalcBoqEl); };
 
+  // ---------- מנוע טבלאות גנרי (בלוקים טבלאיים חדשים) ----------
+  function genRowHTML(columns, r) {
+    r = r || {};
+    const tds = columns.map(c => {
+      if (c.kind === 'sel') return `<td class="ctd">${sel('tc-' + c.key, c.options, r[c.key] != null ? r[c.key] : (c.options[0] || {}).key)}</td>`;
+      const num = c.kind === 'num';
+      return `<td${num ? ' class="num"' : ''}>${inp('cell tc-' + c.key + (num ? ' num' : ''), r[c.key], c.ph || '', num ? 'number' : 'text')}</td>`;
+    }).join('');
+    return `<tr>${tds}<td class="no-print"><button class="rowx" onclick="this.closest('tr').remove();schedSave()">✕</button></td></tr>`;
+  }
+  function tableBlock(id, label, columns, seedFn) {
+    const ths = columns.map(c => `<th>${esc(c.label)}</th>`).join('');
+    BLOCKS[id] = {
+      label, columns,
+      make: (o) => ({ caption: (o && o.caption) || label, rows: (o && o.rows) || (seedFn ? seedFn() : [{}]) }),
+      render(b) {
+        const rows = (b.rows || []).map(r => genRowHTML(columns, r)).join('');
+        return `<table class="mtable"><caption>${ce('cap', b.caption, 'כותרת')}</caption>
+          <thead><tr>${ths}<th class="no-print"></th></tr></thead><tbody>${rows}</tbody></table>
+          <div class="add-row no-print"><button class="btn-add" onclick="addGenRow(this,'${id}')">＋ שורה</button></div>`;
+      },
+      collect(el) {
+        const rows = [];
+        el.querySelectorAll('tbody tr').forEach(tr => { const r = {}; columns.forEach(c => r[c.key] = ival(tr, '.tc-' + c.key)); rows.push(r); });
+        return { caption: txt(el, '.cap'), rows };
+      }
+    };
+  }
+  window.addGenRow = function (btn, id) {
+    const cols = (BLOCKS[id] || {}).columns || [];
+    btn.closest('.block-body').querySelector('tbody').insertAdjacentHTML('beforeend', genRowHTML(cols, {}));
+    schedSave();
+  };
+
+  const RESULT_OPTS = [{ key: '', label: '—' }, { key: 'pass', label: 'תקין' }, { key: 'fail', label: 'לא תקין' }];
+  const PRIO_OPTS = (D.PRIORITY || []).map(p => ({ key: p.key, label: p.label }));
+
+  tableBlock('parties', 'פרטי הצדדים', [
+    { key: 'role', label: 'תפקיד', kind: 'text', ph: 'מזמין/קבלן/מפקח' },
+    { key: 'name', label: 'שם', kind: 'text' }, { key: 'company', label: 'חברה', kind: 'text' },
+    { key: 'license', label: 'ת"ז/רישיון', kind: 'text' }, { key: 'phone', label: 'טלפון', kind: 'text' }
+  ], () => [{ role: 'מזמין' }, { role: 'קבלן' }, { role: 'מפקח' }]);
+
+  tableBlock('tolerances', 'סטיות מותרות', [
+    { key: 'element', label: 'אלמנט', kind: 'text' }, { key: 'allowed', label: 'סטייה מותרת', kind: 'text' }, { key: 'standard', label: 'תקן', kind: 'text' }
+  ], () => (D.TOLERANCE_ROWS || []).map(t => ({ element: t.element, allowed: t.allowed, standard: t.standard })));
+
+  tableBlock('recommendations', 'המלצות לתיקון', [
+    { key: 'finding', label: 'ממצא', kind: 'text' }, { key: 'priority', label: 'עדיפות', kind: 'sel', options: PRIO_OPTS },
+    { key: 'action', label: 'פעולה נדרשת', kind: 'text' }, { key: 'standard', label: 'תקן', kind: 'text' }, { key: 'due', label: 'יעד', kind: 'text' }
+  ]);
+
+  tableBlock('costsummary', 'סיכום עלויות', [
+    { key: 'item', label: 'סעיף', kind: 'text' }, { key: 'qty', label: 'כמות', kind: 'num' }, { key: 'unit', label: 'יח׳', kind: 'text' }, { key: 'price', label: 'מחיר', kind: 'num' }
+  ]);
+
+  tableBlock('revisions', 'היסטוריית גרסאות', [
+    { key: 'rev', label: 'גרסה', kind: 'text' }, { key: 'date', label: 'תאריך', kind: 'text' }, { key: 'author', label: 'עורך', kind: 'text' }, { key: 'desc', label: 'תיאור', kind: 'text' }
+  ]);
+
+  tableBlock('definitions', 'הגדרות ומונחים', [
+    { key: 'term', label: 'מונח', kind: 'text' }, { key: 'definition', label: 'הגדרה', kind: 'text' }
+  ]);
+
+  tableBlock('panel', 'טבלת לוח מעגלים', [
+    { key: 'circuit', label: 'מעגל', kind: 'text' }, { key: 'desc', label: 'תיאור', kind: 'text' }, { key: 'breaker', label: 'מאמ"ת', kind: 'text' },
+    { key: 'poles', label: 'קטבים', kind: 'num' }, { key: 'csa', label: 'חתך mm²', kind: 'text' }, { key: 'rcd', label: 'פחת', kind: 'text' }, { key: 'phase', label: 'פאזה', kind: 'text' }
+  ]);
+
+  tableBlock('rcd', 'בדיקת מפסקי פחת', [
+    { key: 'id', label: 'מזהה', kind: 'text' }, { key: 'idn', label: 'IΔn (mA)', kind: 'text' },
+    { key: 'type', label: 'סוג', kind: 'sel', options: [{ key: 'AC', label: 'AC' }, { key: 'A', label: 'A' }, { key: 'B', label: 'B' }] },
+    { key: 'trip', label: 'זרם ניתוק (mA)', kind: 'num' }, { key: 't1', label: 'זמן 1× (ms)', kind: 'num' }, { key: 't5', label: 'זמן 5× (ms)', kind: 'num' },
+    { key: 'result', label: 'תוצאה', kind: 'sel', options: RESULT_OPTS }
+  ]);
+
+  tableBlock('earth', 'בדיקת הארקות', [
+    { key: 'point', label: 'נקודה', kind: 'text' }, { key: 'electrode', label: 'אלקטרודה (Ω)', kind: 'num' }, { key: 'continuity', label: 'רציפות (Ω)', kind: 'num' },
+    { key: 'method', label: 'שיטה', kind: 'text' }, { key: 'result', label: 'תוצאה', kind: 'sel', options: RESULT_OPTS }
+  ]);
+
+  tableBlock('equipment', 'מכשור וכיול', [
+    { key: 'instrument', label: 'מכשיר', kind: 'text' }, { key: 'model', label: 'דגם', kind: 'text' }, { key: 'serial', label: 'מס׳ סידורי', kind: 'text' },
+    { key: 'cert', label: 'תעודת כיול', kind: 'text' }, { key: 'valid', label: 'בתוקף עד', kind: 'text' }
+  ]);
+
+  // installdetails — וריאציית meta (key/value) עם ברירות מחדל לחשמל
+  BLOCKS.installdetails = {
+    label: 'פרטי מתקן',
+    make: (o) => ({ rows: (o && o.rows) || [
+      { label: 'מתח אספקה', value: '230/400V' }, { label: 'גודל חיבור', value: '3×25A' }, { label: 'פאזות', value: '3' },
+      { label: 'שיטת הארקה', value: 'TN-C-S' }, { label: 'סוג הזנה', value: 'חברת חשמל' }, { label: 'מפסק ראשי', value: '' }
+    ] }),
+    render: BLOCKS.meta.render,
+    collect: BLOCKS.meta.collect
+  };
+
+  // photoannex — גלריית תמונות ממוספרת
+  function annexItem(it) {
+    it = it || {};
+    return `<div class="annex-item" data-id="${uid('ax')}">
+      <div class="pwrap">${photoBox(it.photo, 'תמונה')}${photoActs()}</div>
+      <div class="annex-meta">
+        <div class="frow"><label>מס׳</label>${inp('inp sm a-ref', it.ref, '1')}</div>
+        <div class="frow"><label>מיקום</label>${inp('inp a-loc', it.location, '')}</div>
+        ${inp('inp a-cap', it.caption, 'כיתוב התמונה...')}
+      </div></div>`;
+  }
+  BLOCKS.photoannex = {
+    label: 'נספח תמונות',
+    make: (o) => ({ items: (o && o.items) || [{}] }),
+    render(b) {
+      const items = (b.items || []).map(annexItem).join('');
+      return `<div class="annex-grid">${items}</div>
+        <div class="add-row no-print"><button class="btn-add" onclick="addAnnex(this)">＋ תמונה</button></div>`;
+    },
+    collect(el) {
+      const items = [];
+      el.querySelectorAll('.annex-item').forEach(a => items.push({ ref: ival(a, '.a-ref'), location: ival(a, '.a-loc'), caption: ival(a, '.a-cap'), photo: imgSrc(a, '.pbox') }));
+      return { items };
+    }
+  };
+  window.addAnnex = function (btn) { btn.closest('.block-body').querySelector('.annex-grid').insertAdjacentHTML('beforeend', annexItem({})); schedSave(); };
+
   window.BLOCKS = BLOCKS;
   window.renderBlock = renderBlock;
   window.collectBlock = collectBlock;

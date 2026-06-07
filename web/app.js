@@ -191,6 +191,12 @@ function renderGallery() {
   }).join('');
 }
 window.pickTemplate = function (typeId, tplId) { closeM('mGallery'); createReport(typeId, tplId || null); };
+window.startBlank = function () { closeM('mGallery'); createReport('custom', null); };
+window.renameReport = function () {
+  const p = getProj(S.curProjId), r = p && p.reports.find(x => x.id === S.curRptId); if (!r) return;
+  const name = prompt('שם הדוח:', r.name); if (name == null) return;
+  r.name = name.trim() || r.name; document.getElementById('vr-rpt').textContent = r.name; dbSave(); renderSB();
+};
 window.delUserTpl = async function (id) { if (!confirm('למחוק טמפלייט מותאם זה?')) return; userTemplates = userTemplates.filter(t => t.id !== id); await tplStoreSave(); renderGallery(); toast('הטמפלייט נמחק', 'ok'); };
 
 function findTemplate(id) { return window.getBuiltinTemplate(id) || userTemplates.find(t => t.id === id); }

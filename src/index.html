@@ -64,7 +64,7 @@
         <div class="breadcrumb" style="flex:1">
           <span class="crumb" onclick="goHome()">פרויקטים</span><span class="sep">›</span>
           <span class="crumb" id="vr-proj" onclick="goCurProj()"></span><span class="sep">›</span>
-          <span id="vr-rpt" style="font-weight:600;color:var(--text);"></span>
+          <span id="vr-rpt" class="crumb" onclick="renameReport()" title="שינוי שם הדוח" style="font-weight:600;color:var(--text);"></span>
           <span class="sep">·</span><span id="vr-type" style="font-size:11px;color:var(--muted)"></span>
         </div>
         <div class="r-actions">
@@ -94,23 +94,41 @@
           <h4>פלטת צבעים</h4>
           <div class="pal-row" id="pal-row"></div>
 
-          <h4>הוספת בלוק</h4>
-          <div style="display:flex;flex-wrap:wrap;gap:5px;">
+          <h4>הוספת בלוק — כללי</h4>
+          <div class="add-grid">
             <button class="btn-add" onclick="addBlock('heading')">כותרת</button>
             <button class="btn-add" onclick="addBlock('text')">טקסט</button>
             <button class="btn-add" onclick="addBlock('meta')">פרטי זיהוי</button>
+            <button class="btn-add" onclick="addBlock('parties')">פרטי הצדדים</button>
             <button class="btn-add" onclick="addBlock('defects')">רג׳קטים</button>
-            <button class="btn-add" onclick="addBlock('measure')">מדידות</button>
             <button class="btn-add" onclick="addBlock('checklist')">בדיקה</button>
-            <button class="btn-add" onclick="addBlock('boq')">כתב כמויות</button>
-            <button class="btn-add" onclick="addBlock('loadcalc')">עומסים</button>
-            <button class="btn-add" onclick="addBlock('thermo')">תרמוגרפיה</button>
             <button class="btn-add" onclick="addBlock('summary')">סיכום</button>
+            <button class="btn-add" onclick="addBlock('recommendations')">המלצות</button>
+            <button class="btn-add" onclick="addBlock('photoannex')">נספח תמונות</button>
+            <button class="btn-add" onclick="addBlock('definitions')">הגדרות</button>
+            <button class="btn-add" onclick="addBlock('revisions')">גרסאות</button>
             <button class="btn-add" onclick="addBlock('legal')">הצהרה</button>
             <button class="btn-add" onclick="addBlock('signatures')">חתימות</button>
           </div>
-          <div style="font-size:10.5px;color:var(--muted);margin-top:8px;line-height:1.5">
-            רחף מעל בלוק כדי להזיז/למחוק. כל שדה ניתן לעריכה ישירה במסמך.
+          <h4>בנייה</h4>
+          <div class="add-grid">
+            <button class="btn-add" onclick="addBlock('tolerances')">סטיות מותרות</button>
+            <button class="btn-add" onclick="addBlock('costsummary')">סיכום עלויות</button>
+          </div>
+          <h4>חשמל</h4>
+          <div class="add-grid">
+            <button class="btn-add" onclick="addBlock('installdetails')">פרטי מתקן</button>
+            <button class="btn-add" onclick="addBlock('measure')">מדידות</button>
+            <button class="btn-add" onclick="addBlock('panel')">לוח מעגלים</button>
+            <button class="btn-add" onclick="addBlock('rcd')">בדיקת פחת</button>
+            <button class="btn-add" onclick="addBlock('earth')">בדיקת הארקות</button>
+            <button class="btn-add" onclick="addBlock('loadcalc')">חישובי עומסים</button>
+            <button class="btn-add" onclick="addBlock('boq')">כתב כמויות</button>
+            <button class="btn-add" onclick="addBlock('equipment')">מכשור וכיול</button>
+            <button class="btn-add" onclick="addBlock('thermo')">תרמוגרפיה</button>
+          </div>
+          <div style="font-size:10.5px;color:var(--muted);margin-top:10px;line-height:1.55">
+            רחף מעל בלוק כדי להזיז/למחוק. כל שדה ניתן לעריכה ישירה במסמך. לחיצה על שם הדוח למעלה — לשינוי שם.
           </div>
         </aside>
 
@@ -157,6 +175,7 @@
   <div class="modal wide">
     <div class="modal-h"><span>בחירת סוג דוח וטמפלייט</span><button class="modal-x" onclick="closeM('mGallery')">✕</button></div>
     <div class="modal-b">
+      <button class="btn btn-b" style="width:100%;margin-bottom:14px;justify-content:center" onclick="startBlank()">✨ התחל ממסמך ריק — כל האפשרויות</button>
       <div class="gal-cats">
         <div class="gal-cat on" data-cat="build" onclick="galCat('build')">🏗️ בנייה</div>
         <div class="gal-cat" data-cat="elec" onclick="galCat('elec')">⚡ חשמל</div>
