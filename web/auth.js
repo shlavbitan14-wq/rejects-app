@@ -173,10 +173,20 @@
   AUTH.start = async function () {
     if (!window.sb) { show('<div class="auth-sub">שגיאת חיבור ל-Supabase</div>'); return; }
     const { data: { session } } = await window.sb.auth.getSession();
-    // אם יש קישור הזמנה אבל אין session — הצג הרשמה
     const inviteToken = new URLSearchParams(window.location.search).get('invite');
-    if (!session && inviteToken) { signupView(); return; }
-    if (session) resolveProfile(); else loginView();
+    const shareToken  = new URLSearchParams(window.location.search).get('share');
+
+    // אם אין session ואין Electron — הפנה לדף הנחיתה
+    if (!session && !window.IS_EL) {
+      // אם יש invite/share token — הצג login inline (token חייב להיות מועבר)
+      if (inviteToken) { signupView(); return; }
+      if (shareToken)  { loginView();  return; }
+      // אחרת — redirect לdף הנחיתה
+      window.location.href = 'landing.html';
+      return;
+    }
+    if (!session) { loginView(); return; } // Electron fallback
+    resolveProfile();
   };
 
   function confirmHtml(email) {

@@ -21,8 +21,9 @@
     <div class="sb-nav">
       <div class="sb-sec">תפריט</div>
       <div class="nav-i on" id="nav-home" onclick="goHome()"><span class="ico">🏠</span><span>פרויקטים</span></div>
+      <div class="nav-i" id="nav-company" style="display:none" onclick="CO.open()"><span class="ico">🏢</span><span>פרויקטי החברה</span></div>
       <div class="nav-i" id="nav-team" style="display:none" onclick="TEAM.open()"><span class="ico">👥</span><span>צוות</span></div>
-      <div class="nav-i" id="nav-admin" style="display:none" onclick="window.initAdmin && window.initAdmin(window.CLOUD.profile)"><span class="ico">🛡️</span><span>Super Admin</span></div>
+      <div class="nav-i" id="nav-admin" style="display:none" onclick="window.initAdmin && window.initAdmin(window.CLOUD.profile)"><span class="ico">🛡️</span><span>Super Admin</span><span class="leads-badge" id="admin-leads-nav-badge" style="display:none">0</span></div>
     </div>
     <div class="sb-sec" style="padding:6px 16px 3px;">פרויקטים</div>
     <div class="sb-projs" id="sb-projs"></div>
@@ -165,6 +166,9 @@
     <!-- VIEW: TEAM MANAGER -->
     <div class="view" id="vTeam"></div>
 
+    <!-- VIEW: COMPANY PROJECTS (manager) -->
+    <div class="view" id="vCompany"></div>
+
   </div><!-- /main -->
 </div><!-- /app -->
 
@@ -233,6 +237,12 @@
   </div>
 </div>
 
+<!-- BANNER: Manager view (company projects drill-down) -->
+<div id="manager-view-banner" style="display:none;position:fixed;top:0;left:0;right:0;z-index:800;background:#0d9488;color:#fff;padding:8px 16px;align-items:center;justify-content:space-between;font-size:13px;font-weight:600;gap:12px">
+  <span>🏢 <span id="manager-view-banner-name"></span></span>
+  <button onclick="CO.exitViewAs && CO.exitViewAs()" style="background:rgba(255,255,255,.2);border:none;color:#fff;padding:5px 12px;border-radius:20px;cursor:pointer;font-size:12px">✕ חזרה לפרויקטי החברה</button>
+</div>
+
 <!-- BANNER: Super Admin view-as mode -->
 <div id="admin-view-banner" style="display:none;position:fixed;top:0;left:0;right:0;z-index:800;background:#0071e3;color:#fff;padding:8px 16px;align-items:center;justify-content:space-between;font-size:13px;font-weight:600;gap:12px">
   <span>🛡️ Super Admin — <span id="admin-view-banner-name"></span></span>
@@ -264,7 +274,11 @@
       <div class="fld"><label>מקס׳ מהנדסים</label><input type="number" id="nc-maxeng" value="5" min="1"></div>
       <div class="fld full"><label>תפוגה (אופציונלי)</label><input type="date" id="nc-expires"></div>
     </div>
-    <div class="create-co-footer">
+    <div class="create-co-invite">
+      <label>שלח הזמנה למנהל (אופציונלי)</label>
+      <input type="email" id="nc-invite-email" placeholder="אימייל המנהל הראשון — יקבל קישור הצטרפות">
+    </div>
+    <div class="create-co-footer" style="margin-top:16px">
       <button class="btn btn-o" onclick="document.getElementById('mCreateCompany').classList.remove('on')">ביטול</button>
       <button class="btn btn-p" id="nc-go" onclick="ADMIN.doCreateCompany()">צור חברה</button>
     </div>
@@ -283,6 +297,7 @@
 <script src="auth.js"></script>
 <script src="admin.js"></script>
 <script src="team.js"></script>
+<script src="company.js"></script>
 <script src="vendor/html2canvas.min.js"></script>
 <script src="vendor/jspdf.umd.min.js"></script>
 <script src="data/domain.js"></script>

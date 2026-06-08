@@ -37,10 +37,12 @@ window.renderUserChip = function (profile) {
       <div class="user-role">${esc(roleLbl)}</div>
     </div>
     <button class="user-out" title="התנתקות" onclick="AUTH.signOut()">⎋</button>`;
-  const navTeam = document.getElementById('nav-team');
-  const navAdmin = document.getElementById('nav-admin');
-  if (navTeam) navTeam.style.display = (profile.role === 'manager') ? 'flex' : 'none';
-  if (navAdmin) navAdmin.style.display = (profile.role === 'super_admin') ? 'flex' : 'none';
+  const navTeam    = document.getElementById('nav-team');
+  const navAdmin   = document.getElementById('nav-admin');
+  const navCompany = document.getElementById('nav-company');
+  if (navTeam)    navTeam.style.display    = (profile.role === 'manager') ? 'flex' : 'none';
+  if (navAdmin)   navAdmin.style.display   = (profile.role === 'super_admin') ? 'flex' : 'none';
+  if (navCompany) navCompany.style.display = (profile.role === 'manager') ? 'flex' : 'none';
 };
 
 // ===== DB (פרויקטים) =====

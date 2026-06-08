@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: blob: https://jwhtujgfzqebfckcxdqt.supabase.co; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; font-src 'self'; connect-src 'self' https://jwhtujgfzqebfckcxdqt.supabase.co wss://jwhtujgfzqebfckcxdqt.supabase.co; object-src 'none'; frame-src 'none'; base-uri 'none'; form-action 'none'">
+<title>RejectsApp — ניהול ליקויים מקצועי</title>
+<link rel="stylesheet" href="landing.css">
+</head>
+<body>
+
+<!-- Background blobs -->
+<div class="bg-blob blob-1"></div>
+<div class="bg-blob blob-2"></div>
+<div class="bg-blob blob-3"></div>
+
+<div class="land-wrap">
+
+  <!-- ===== LEFT: Hero ===== -->
+  <div class="land-hero">
+    <div class="land-brand">
+      <div class="land-logo-wrap">
+        <span class="land-logo-ico">⚡</span>
+      </div>
+      <div>
+        <div class="land-brand-name">RejectsApp</div>
+        <div class="land-brand-sub">פתרון בנייה וחשמל</div>
+      </div>
+    </div>
+
+    <h1 class="land-headline">
+      ניהול ליקויים<br>
+      <span class="land-headline-accent">ברמה אחרת</span>
+    </h1>
+    <p class="land-tagline">
+      הפלטפורמה המקצועית לצוותי בנייה וחשמל —<br>
+      דוחות, תמונות, מדידות ומעקב, הכל במקום אחד.
+    </p>
+
+    <ul class="land-features">
+      <li><span class="feat-ico">📄</span><span>דוחות PDF מקצועיים בכפתור אחד</span></li>
+      <li><span class="feat-ico">📸</span><span>תמונות לפני ואחרי בחדות מלאה</span></li>
+      <li><span class="feat-ico">👥</span><span>ניהול צוות רב-מהנדסים בענן</span></li>
+      <li><span class="feat-ico">🔒</span><span>מידע מאובטח — גישה לפי הרשאות</span></li>
+    </ul>
+
+    <div class="land-clients">
+      <span class="land-clients-lbl">מאות מהנדסים משתמשים כבר היום</span>
+    </div>
+  </div>
+
+  <!-- ===== RIGHT: Auth Card ===== -->
+  <div class="land-card-wrap">
+    <div class="land-card">
+
+      <!-- Tabs -->
+      <div class="land-tabs">
+        <button class="land-tab on" id="tab-btn-login" onclick="LAND.showTab('login')">כניסה</button>
+        <button class="land-tab" id="tab-btn-lead" onclick="LAND.showTab('lead')">בקשת גישה</button>
+      </div>
+
+      <!-- ── LOGIN FORM ── -->
+      <div id="tab-login" class="land-form">
+        <div class="land-form-title">ברוך הבא</div>
+        <div class="land-form-sub">התחבר לסביבת העבודה שלך</div>
+        <div class="land-err" id="login-err"></div>
+        <div class="land-fld">
+          <label for="l-email">אימייל</label>
+          <input id="l-email" type="email" autocomplete="email" placeholder="name@company.com">
+        </div>
+        <div class="land-fld">
+          <label for="l-pass">סיסמה</label>
+          <input id="l-pass" type="password" autocomplete="current-password" placeholder="••••••••">
+        </div>
+        <button class="land-btn primary" id="login-btn" onclick="LAND.doLogin()">התחבר</button>
+        <div class="land-hint">
+          אין לך חשבון? <a onclick="LAND.showTab('lead')">בקש גישה</a>
+        </div>
+      </div>
+
+      <!-- ── LEAD / DEMO REQUEST FORM ── -->
+      <div id="tab-lead" class="land-form" style="display:none">
+        <div class="land-form-title">בקשת גישה</div>
+        <div class="land-form-sub">ניצור איתך קשר תוך 24 שעות</div>
+        <div class="land-err" id="lead-err"></div>
+        <div class="land-grid-2">
+          <div class="land-fld">
+            <label for="ld-name">שם מלא *</label>
+            <input id="ld-name" type="text" placeholder="ישראל ישראלי">
+          </div>
+          <div class="land-fld">
+            <label for="ld-phone">טלפון</label>
+            <input id="ld-phone" type="tel" placeholder="050-0000000">
+          </div>
+        </div>
+        <div class="land-fld">
+          <label for="ld-email">אימייל *</label>
+          <input id="ld-email" type="email" placeholder="name@company.com">
+        </div>
+        <div class="land-fld">
+          <label for="ld-company">שם החברה *</label>
+          <input id="ld-company" type="text" placeholder="חברת בנייה / ייעוץ חשמל">
+        </div>
+        <div class="land-grid-2">
+          <div class="land-fld">
+            <label for="ld-industry">תחום</label>
+            <select id="ld-industry">
+              <option value="construction">בנייה / קבלנות</option>
+              <option value="electrical">חשמל / ELV</option>
+              <option value="inspection">פיקוח ובקרה</option>
+              <option value="other">אחר</option>
+            </select>
+          </div>
+          <div class="land-fld">
+            <label for="ld-size">גודל צוות</label>
+            <select id="ld-size">
+              <option value="1">מהנדס עצמאי</option>
+              <option value="2-5">2–5 מהנדסים</option>
+              <option value="6-20">6–20 מהנדסים</option>
+              <option value="21+">21+ מהנדסים</option>
+            </select>
+          </div>
+        </div>
+        <div class="land-fld">
+          <label for="ld-msg">הודעה (אופציונלי)</label>
+          <textarea id="ld-msg" rows="2" placeholder="ספר לנו על הצוות, סוג הפרויקטים..."></textarea>
+        </div>
+        <button class="land-btn primary" id="lead-btn" onclick="LAND.submitLead()">שלח בקשה</button>
+        <div class="land-hint">
+          כבר יש לך חשבון? <a onclick="LAND.showTab('login')">התחברות</a>
+        </div>
+      </div>
+
+      <!-- ── SUCCESS STATE ── -->
+      <div id="tab-success" class="land-form land-success" style="display:none">
+        <div class="success-ico">✓</div>
+        <div class="land-form-title">הבקשה נשלחה!</div>
+        <div class="land-form-sub">ניצור איתך קשר תוך 24 שעות עם פרטי הגישה לסביבה שלך.</div>
+        <div class="land-hint" style="margin-top:24px">
+          כבר קיבלת גישה? <a onclick="LAND.showTab('login')">התחברות</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div><!-- /land-wrap -->
+
+<!-- Footer -->
+<div class="land-footer">
+  <span>© 2026 RejectsApp</span>
+  <span>·</span>
+  <span>מערכת ניהול ליקויים מקצועית</span>
+</div>
+
+<script src="vendor/supabase.js"></script>
+<script src="supabase-config.js"></script>
+<script src="landing.js"></script>
+</body>
+</html>

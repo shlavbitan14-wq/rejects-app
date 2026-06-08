@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: blob: https://jwhtujgfzqebfckcxdqt.supabase.co; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; font-src 'self'; connect-src 'self' https://jwhtujgfzqebfckcxdqt.supabase.co wss://jwhtujgfzqebfckcxdqt.supabase.co; object-src 'none'; frame-src 'none';">
+<title>צפייה בדוח — RejectsApp</title>
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="share.css">
+</head>
+<body>
+
+<!-- Header bar -->
+<div id="share-header">
+  <div class="sh-brand">
+    <span class="sh-logo-ico">⚡</span>
+    <span class="sh-brand-name">RejectsApp</span>
+  </div>
+  <div class="sh-meta" id="sh-meta">
+    <span id="sh-title">טוען…</span>
+  </div>
+  <div class="sh-actions">
+    <button class="sh-btn" id="btn-pdf" onclick="shareDownloadPDF()" style="display:none">
+      📄 הורד PDF
+    </button>
+  </div>
+</div>
+
+<!-- Loading / Error states -->
+<div id="share-loading" class="share-state">
+  <div class="state-ico">⏳</div>
+  <div class="state-title">טוען דוח…</div>
+</div>
+<div id="share-error" class="share-state" style="display:none">
+  <div class="state-ico">🔒</div>
+  <div class="state-title">הקישור אינו תקף</div>
+  <div class="state-sub">ייתכן שהקישור פג תוקף או שגוי.</div>
+</div>
+
+<!-- Document container -->
+<div id="share-doc" style="display:none">
+  <div class="r-scroll">
+    <div class="sheet" id="sheet"></div>
+  </div>
+</div>
+
+<!-- Footer -->
+<div id="share-footer">
+  <span>מופעל ע"י <strong>RejectsApp</strong></span>
+  <span>·</span>
+  <a href="landing.html">קבל גישה מלאה</a>
+</div>
+
+<script src="vendor/supabase.js"></script>
+<script src="supabase-config.js"></script>
+<script src="vendor/html2canvas.min.js"></script>
+<script src="vendor/jspdf.umd.min.js"></script>
+<script src="data/domain.js"></script>
+<script src="blocks.js"></script>
+<script src="share.js"></script>
+</body>
+</html>

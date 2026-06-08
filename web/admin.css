@@ -161,11 +161,122 @@
 /* ===== באנר view-as mode ===== */
 #admin-view-banner{ font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",sans-serif; }
 
+/* ===== Leads badge ===== */
+.leads-badge{
+  display:inline-flex; align-items:center; justify-content:center;
+  min-width:18px; height:18px; border-radius:20px; padding:0 5px;
+  background:var(--err); color:#fff; font-size:10.5px; font-weight:700;
+  margin-right:5px; line-height:1;
+}
+
+/* ===== Section wrapper ===== */
+.admin-section-wrap{ display:flex; flex-direction:column; gap:16px; }
+
+/* ===== Lead rows ===== */
+.lead-row{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:12px 16px; border-bottom:1px solid var(--hair);
+  cursor:pointer; transition:background .12s; gap:12px;
+}
+.lead-row:last-child{ border-bottom:none; }
+.lead-row:hover{ background:rgba(0,113,227,.04); }
+.lead-row-left{ display:flex; align-items:center; gap:10px; flex:1; min-width:0; }
+.lead-row-right{ display:flex; flex-direction:column; align-items:flex-end; gap:4px; flex-shrink:0; }
+.lead-av{
+  width:36px; height:36px; border-radius:50%; background:var(--accent-ui);
+  color:#fff; display:flex; align-items:center; justify-content:center;
+  font-size:14px; font-weight:700; flex-shrink:0;
+}
+.lead-info{ flex:1; min-width:0; }
+.lead-name{ font-size:13.5px; font-weight:700; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.lead-co{ font-size:11.5px; color:var(--muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.lead-email{ font-size:11px; color:var(--muted); }
+.lead-date{ font-size:10.5px; color:var(--muted); white-space:nowrap; }
+
+/* ===== Lead status badges ===== */
+.lead-status-badge{
+  display:inline-block; padding:2px 9px; border-radius:20px;
+  font-size:10.5px; font-weight:700; letter-spacing:.02em;
+}
+.status-new      { background:#fef3c7; color:#92400e; }
+.status-contacted{ background:#dbeafe; color:#1e40af; }
+.status-converted{ background:#dcfce7; color:#166534; }
+.status-rejected { background:#f3f4f6; color:#6b7280; }
+
+/* ===== Lead detail ===== */
+.lead-detail-grid{ display:flex; flex-direction:column; gap:6px; }
+.lead-detail-row{
+  display:flex; justify-content:space-between; align-items:center;
+  font-size:12.5px; padding:5px 0; border-bottom:1px solid var(--hair);
+}
+.lead-detail-row:last-child{ border-bottom:none; }
+.lead-detail-row span:first-child{ color:var(--muted); font-weight:600; font-size:11px; text-transform:uppercase; letter-spacing:.04em; }
+
+/* ===== Create Company modal — invite email field ===== */
+.create-co-invite{ grid-column:1/-1; margin-top:4px; padding-top:12px; border-top:1px solid var(--hair); }
+.create-co-invite label{ font-size:11px; color:var(--muted); font-weight:600; display:block; margin-bottom:5px; text-transform:uppercase; letter-spacing:.04em; }
+.create-co-invite input{ width:100%; padding:9px 11px; border:1px solid var(--border); border-radius:10px; font-family:inherit; font-size:13.5px; background:var(--fill2); outline:none; }
+.create-co-invite input:focus{ border-color:var(--accent-ui); background:#fff; box-shadow:var(--ring); }
+
+/* ===== Company Projects View ===== */
+#vCompany{ direction:rtl; }
+.co-loading{ padding:32px; text-align:center; color:var(--muted); font-size:13px; }
+.co-err{ padding:14px 18px; color:var(--err); font-size:13px; }
+
+.co-eng-section{
+  background:var(--card); border:1px solid var(--hair); border-radius:16px;
+  overflow:hidden; margin-bottom:16px; box-shadow:var(--sh-1);
+}
+.co-eng-head{
+  display:flex; align-items:center; gap:12px; padding:14px 18px;
+  cursor:pointer; transition:background .12s; border-bottom:1px solid var(--hair);
+}
+.co-eng-head:hover{ background:rgba(0,113,227,.04); }
+.co-eng-av{
+  width:38px; height:38px; border-radius:50%; background:var(--accent-ui);
+  color:#fff; display:flex; align-items:center; justify-content:center;
+  font-size:15px; font-weight:700; flex-shrink:0;
+}
+.co-eng-info{ flex:1; }
+.co-eng-name{ font-size:14px; font-weight:700; }
+.co-eng-sub{ font-size:11.5px; color:var(--muted); }
+.co-eng-chevron{
+  font-size:20px; color:var(--muted); transition:transform .2s;
+}
+.co-eng-projects{
+  display:none; padding:0;
+}
+.co-eng-projects.open{ display:block; }
+
+.co-proj-group{ padding:12px 18px; border-bottom:1px solid var(--hair); }
+.co-proj-group:last-child{ border-bottom:none; }
+.co-proj-name{
+  font-size:12px; font-weight:700; color:var(--muted);
+  text-transform:uppercase; letter-spacing:.04em;
+  margin-bottom:10px;
+}
+.co-reports-grid{
+  display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:10px;
+}
+.co-report-card{
+  border:1px solid var(--border2); border-radius:12px; padding:14px 16px;
+  cursor:pointer; transition:.18s; background:#fff; position:relative;
+  display:flex; flex-direction:column; gap:6px;
+}
+.co-report-card:hover{ box-shadow:var(--sh-2); transform:translateY(-2px); }
+.co-report-title{
+  font-size:13px; font-weight:600; color:var(--text);
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+.co-report-date{ font-size:11px; color:var(--muted); }
+.co-report-actions{ display:flex; gap:6px; margin-top:4px; flex-wrap:wrap; }
+
 @media(max-width:600px){
   .admin-stats{ grid-template-columns:repeat(2,1fr); }
   .lic-form{ grid-template-columns:1fr; }
   .create-co-grid{ grid-template-columns:1fr; }
   .admin-body,.team-body{ padding:14px 12px; }
+  .co-reports-grid{ grid-template-columns:1fr 1fr; }
 }
 
 @media print{

@@ -1,0 +1,281 @@
+/* =====================================================================
+ * landing.css — עיצוב דף הנחיתה של RejectsApp.
+ * Dark, premium, Apple-inspired.
+ * ===================================================================== */
+
+*, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+
+:root {
+  --accent: #b91c1c;
+  --accent-glow: rgba(185,28,28,.35);
+  --bg: #0b0f19;
+  --bg2: #111827;
+  --card-bg: rgba(255,255,255,.04);
+  --card-border: rgba(255,255,255,.1);
+  --text: #f1f5f9;
+  --muted: #94a3b8;
+  --faint: rgba(255,255,255,.06);
+  --inp-bg: rgba(255,255,255,.07);
+  --inp-border: rgba(255,255,255,.12);
+  --inp-focus: rgba(185,28,28,.5);
+  --err-clr: #fca5a5;
+  --r: 14px;
+  --ease: cubic-bezier(.32,.72,0,1);
+}
+
+html, body {
+  height: 100%;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "SF Pro Text", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  direction: rtl;
+  overflow-x: hidden;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* ===== Background animated blobs ===== */
+.bg-blob {
+  position: fixed; border-radius: 50%;
+  filter: blur(80px); opacity: .18; pointer-events: none; z-index: 0;
+  animation: blobFloat 14s ease-in-out infinite alternate;
+}
+.blob-1 { width:600px; height:600px; background:var(--accent); top:-200px; right:-200px; animation-delay:0s; }
+.blob-2 { width:500px; height:500px; background:#1e40af; bottom:-150px; left:-150px; animation-delay:-5s; }
+.blob-3 { width:350px; height:350px; background:#7c3aed; top:50%; left:40%; animation-delay:-10s; opacity:.1; }
+@keyframes blobFloat {
+  from { transform: translate(0,0) scale(1); }
+  to   { transform: translate(30px,40px) scale(1.08); }
+}
+
+/* ===== Layout ===== */
+.land-wrap {
+  position: relative; z-index: 1;
+  min-height: 100vh;
+  display: flex; align-items: center;
+  padding: 40px 32px;
+  gap: 60px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+/* ===== LEFT: Hero ===== */
+.land-hero {
+  flex: 1; min-width: 0;
+  display: flex; flex-direction: column; gap: 28px;
+}
+.land-brand {
+  display: flex; align-items: center; gap: 14px;
+}
+.land-logo-wrap {
+  width: 48px; height: 48px; border-radius: 14px;
+  background: linear-gradient(135deg, var(--accent), #7c3aed);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px;
+  box-shadow: 0 8px 24px var(--accent-glow);
+}
+.land-brand-name {
+  font-size: 20px; font-weight: 800; letter-spacing: -.04em;
+  color: #fff;
+}
+.land-brand-sub {
+  font-size: 11px; color: var(--muted); letter-spacing: .06em; text-transform: uppercase;
+}
+
+.land-headline {
+  font-size: clamp(32px, 4vw, 52px);
+  font-weight: 900; line-height: 1.15;
+  letter-spacing: -.04em;
+  color: #fff;
+}
+.land-headline-accent {
+  background: linear-gradient(135deg, var(--accent) 20%, #f87171 80%);
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.land-tagline {
+  font-size: 16px; color: var(--muted); line-height: 1.7;
+  max-width: 440px;
+}
+
+.land-features {
+  list-style: none;
+  display: flex; flex-direction: column; gap: 12px;
+}
+.land-features li {
+  display: flex; align-items: center; gap: 12px;
+  font-size: 14.5px; color: #cbd5e1;
+}
+.feat-ico {
+  font-size: 18px; flex-shrink: 0;
+  width: 36px; height: 36px; border-radius: 10px;
+  background: var(--faint); display: flex;
+  align-items: center; justify-content: center;
+}
+
+.land-clients {
+  margin-top: 8px;
+}
+.land-clients-lbl {
+  font-size: 12px; color: var(--muted);
+  padding: 6px 14px; border: 1px solid var(--card-border);
+  border-radius: 20px; display: inline-block;
+}
+
+/* ===== RIGHT: Card ===== */
+.land-card-wrap {
+  flex: 0 0 420px;
+}
+.land-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 24px;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  padding: 32px;
+  box-shadow: 0 32px 80px rgba(0,0,0,.4), 0 0 0 1px rgba(255,255,255,.05);
+}
+
+/* ===== Tabs ===== */
+.land-tabs {
+  display: flex; gap: 4px;
+  background: rgba(255,255,255,.06); border-radius: 12px; padding: 4px;
+  margin-bottom: 28px;
+}
+.land-tab {
+  flex: 1; padding: 9px 14px;
+  border: none; border-radius: 9px;
+  cursor: pointer; font-family: inherit; font-size: 13.5px; font-weight: 600;
+  color: var(--muted); background: transparent;
+  transition: all .2s var(--ease);
+}
+.land-tab.on {
+  background: rgba(255,255,255,.12); color: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,.3);
+}
+.land-tab:hover:not(.on) { color: #e2e8f0; }
+
+/* ===== Form ===== */
+.land-form-title {
+  font-size: 22px; font-weight: 800; letter-spacing: -.03em;
+  color: #fff; margin-bottom: 4px;
+}
+.land-form-sub {
+  font-size: 13px; color: var(--muted); margin-bottom: 22px;
+}
+.land-err {
+  background: rgba(220,38,38,.15); border: 1px solid rgba(220,38,38,.3);
+  color: var(--err-clr); border-radius: 8px; padding: 9px 13px;
+  font-size: 12.5px; margin-bottom: 14px; display: none;
+}
+.land-err.on { display: block; }
+
+.land-fld {
+  display: flex; flex-direction: column; gap: 6px;
+  margin-bottom: 14px;
+}
+.land-fld label {
+  font-size: 11.5px; font-weight: 600;
+  color: #94a3b8; text-transform: uppercase; letter-spacing: .06em;
+}
+.land-fld input,
+.land-fld select,
+.land-fld textarea {
+  background: var(--inp-bg);
+  border: 1px solid var(--inp-border);
+  border-radius: 10px;
+  padding: 10px 13px;
+  font-family: inherit; font-size: 13.5px;
+  color: var(--text);
+  outline: none; transition: all .18s;
+  width: 100%;
+}
+.land-fld input::placeholder,
+.land-fld textarea::placeholder { color: rgba(148,163,184,.5); }
+.land-fld input:focus,
+.land-fld select:focus,
+.land-fld textarea:focus {
+  border-color: var(--inp-focus);
+  background: rgba(255,255,255,.08);
+  box-shadow: 0 0 0 3px rgba(185,28,28,.18);
+}
+.land-fld select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2394a3b8' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: left 12px center;
+  padding-left: 34px;
+  cursor: pointer;
+}
+.land-fld select option {
+  background: #1e293b; color: var(--text);
+}
+.land-fld textarea { resize: vertical; min-height: 72px; }
+
+.land-grid-2 {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+}
+
+.land-btn {
+  width: 100%; padding: 13px;
+  border: none; border-radius: 12px;
+  font-family: inherit; font-size: 14.5px; font-weight: 700;
+  cursor: pointer; transition: all .18s var(--ease);
+  margin-top: 4px; letter-spacing: -.01em;
+}
+.land-btn.primary {
+  background: linear-gradient(135deg, var(--accent), #991b1b);
+  color: #fff;
+  box-shadow: 0 6px 20px var(--accent-glow);
+}
+.land-btn.primary:hover { transform: translateY(-1px); box-shadow: 0 10px 28px var(--accent-glow); }
+.land-btn.primary:active { transform: translateY(0); }
+.land-btn:disabled { opacity: .55; cursor: not-allowed; transform: none !important; }
+
+.land-hint {
+  text-align: center; font-size: 12.5px; color: var(--muted); margin-top: 16px;
+}
+.land-hint a {
+  color: #f87171; cursor: pointer; font-weight: 600;
+  text-decoration: none;
+}
+.land-hint a:hover { text-decoration: underline; }
+
+/* ===== Success state ===== */
+.land-success { text-align: center; padding: 12px 0; }
+.success-ico {
+  width: 64px; height: 64px; border-radius: 50%;
+  background: linear-gradient(135deg, #16a34a, #15803d);
+  color: #fff; font-size: 28px; font-weight: 900;
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 20px;
+  box-shadow: 0 8px 24px rgba(22,163,74,.4);
+}
+.land-success .land-form-sub { max-width: 280px; margin: 6px auto 0; line-height: 1.7; }
+
+/* ===== Footer ===== */
+.land-footer {
+  position: relative; z-index: 1;
+  text-align: center; padding: 20px;
+  font-size: 11.5px; color: rgba(148,163,184,.5);
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 800px) {
+  .land-wrap {
+    flex-direction: column; padding: 32px 20px 24px;
+    gap: 36px; align-items: stretch;
+  }
+  .land-hero { gap: 20px; }
+  .land-card-wrap { flex: none; }
+  .land-headline { font-size: 34px; }
+  .land-tagline { display: none; }
+  .land-clients { display: none; }
+}
+@media (max-width: 480px) {
+  .land-card { padding: 24px 20px; border-radius: 20px; }
+  .land-grid-2 { grid-template-columns: 1fr; }
+  .land-features { display: none; }
+}
