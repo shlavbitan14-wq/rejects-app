@@ -498,3 +498,50 @@ body{
 }
 
 @page{ size:A4; margin:18mm 15mm 16mm 15mm; }
+
+/* ===== PDF EXPORT (html2canvas capture mode) =====
+ * מחקה את @media print אבל רץ בדפדפן לפני html2canvas.
+ * body.pdf-exporting מוסר ע"י doPDF אחרי הצילום. */
+body.pdf-exporting #sb,
+body.pdf-exporting .r-toolbar,
+body.pdf-exporting .r-panel,
+body.pdf-exporting .no-print,
+body.pdf-exporting .topbar,
+body.pdf-exporting .block-ctl,
+body.pdf-exporting .add-row,
+body.pdf-exporting .pact,
+body.pdf-exporting .sig-acts,
+body.pdf-exporting .rdel,
+body.pdf-exporting .meta-x,
+body.pdf-exporting .rowx,
+body.pdf-exporting .btn-add,
+body.pdf-exporting .mobile-actionbar,
+body.pdf-exporting #drawer-bd,
+body.pdf-exporting #authGate,
+body.pdf-exporting .srow,
+body.pdf-exporting .files-add,
+body.pdf-exporting .file-x,
+body.pdf-exporting #rejectFileInput,
+body.pdf-exporting .user-out{ display:none!important; }
+
+body.pdf-exporting *{ -webkit-print-color-adjust:exact!important; print-color-adjust:exact!important; }
+
+body.pdf-exporting .sheet{
+  max-width:100%!important; width:100%!important;
+  margin:0!important; padding:16px 20px!important;
+  box-shadow:none!important; border-radius:0!important;
+}
+body.pdf-exporting .inp,
+body.pdf-exporting .cell{ border:none!important; background:transparent!important; box-shadow:none!important; }
+body.pdf-exporting .rbox{ border:none!important; border-right:2pt solid var(--accent)!important; background:transparent!important; box-shadow:none!important; resize:none!important; }
+body.pdf-exporting .item{ background:#fff!important; border:1pt solid var(--g2)!important; border-inline-start-width:3pt!important; }
+body.pdf-exporting .pbox img{ object-fit:contain!important; }
+body.pdf-exporting .badge{ padding:1pt 7pt!important; font-size:8pt!important; }
+body.pdf-exporting input[type=text],
+body.pdf-exporting input[type=tel],
+body.pdf-exporting input[type=number]{ border:none!important; background:transparent!important; }
+body.pdf-exporting .mval,
+body.pdf-exporting .meta-val,
+body.pdf-exporting .meta-label{ background:none!important; }
+body.pdf-exporting .r-workspace{ overflow:visible!important; display:block!important; }
+body.pdf-exporting .r-scroll{ overflow:visible!important; position:static!important; background:#fff!important; }

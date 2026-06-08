@@ -113,6 +113,9 @@
       <div class="co-panel-head">
         <div class="co-panel-name">${esc(c.name)}</div>
         <div class="co-panel-sub">נוצר: ${fmtDate(c.created_at)}</div>
+        <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-o btn-sm" onclick="ADMIN.browseCompanyMembers('${c.id}')">👁️ כניסה לסביבה</button>
+        </div>
       </div>
 
       <div class="co-panel-section">
@@ -181,9 +184,80 @@
           <div class="member-email">${esc(m.email)}</div>
         </div>
         <span class="plan-badge plan-${m.role}">${roleHe(m.role)}</span>
+        <button class="btn btn-o btn-sm" onclick="ADMIN.viewUserWorkspace('${m.id}','${esc(m.full_name)}','${companyId}')">👁️ צפה</button>
         <button class="btn btn-o btn-sm" onclick="ADMIN.removeMember('${m.id}','${esc(m.full_name)}','${companyId}')">הסר</button>
       </div>`).join('');
   }
+
+  // ===== כניסה לסביבת משתמש (Super Admin view-as) =====
+  ADMIN.browseCompanyMembers = async function (companyId) {
+    const { data, error } = await window.sb.rpc('list_company_members', { p_company_id: companyId });
+    if (error || !data || !data.length) { alert('אין חברים בחברה זו'); return; }
+    const co = _companies.find(c => c.id === companyId);
+    const modal = document.getElementById('mViewAs');
+    if (!modal) return;
+    document.getElementById('view-as-title').textContent = (co ? co.name : '') + ' — בחר משתמש';
+    document.getElementById('view-as-list').innerHTML = data.map(m => `
+      <div class="member-row" style="cursor:pointer;padding:10px;border-radius:10px;transition:.12s"
+           onmouseover="this.style.background='rgba(0,113,227,.07)'"
+           onmouseout="this.style.background=''"
+           onclick="ADMIN.viewUserWorkspace('${m.id}','${esc(m.full_name)}','${companyId}')">
+        <div class="member-av">${(m.full_name||'?').charAt(0).toUpperCase()}</div>
+        <div class="member-info">
+          <div class="member-name">${esc(m.full_name)}</div>
+          <div class="member-email">${esc(m.email)} · ${roleHe(m.role)}</div>
+        </div>
+        <span style="font-size:18px;color:var(--muted)">›</span>
+      </div>`).join('');
+    modal.classList.add('on');
+  };
+
+  ADMIN.viewUserWorkspace = async function (userId, userName, companyId) {
+    // סגור modal אם פתוח
+    const modal = document.getElementById('mViewAs');
+    if (modal) modal.classList.remove('on');
+
+    // טען את ה-workspace של המשתמש הזה
+    const { data: ws, error } = await window.sb
+      .from('workspaces').select('data').eq('user_id', userId).maybeSingle();
+
+    if (error) { alert('שגיאה בטעינת הסביבה: ' + error.message); return; }
+
+    // שמור snapshot של המצב הנוכחי (super admin)
+    window._adminViewAsPrev = {
+      profile: window.CLOUD && window.CLOUD.profile,
+    };
+
+    // הפעל את האפליקציה עם הנתונים שלו (read-only view)
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('on'));
+    document.getElementById('vh').classList.add('on');
+
+    // הודעת באנר
+    const banner = document.getElementById('admin-view-banner');
+    if (banner) {
+      banner.style.display = 'flex';
+      document.getElementById('admin-view-banner-name').textContent = 'צופה בסביבת: ' + userName;
+    }
+
+    // טען נתונים לתוך האפליקציה (read-only, לא ישמור)
+    if (window.S && ws && ws.data) {
+      try {
+        const d = JSON.parse(ws.data);
+        if (d.projects) { window.S.projects = d.projects; }
+      } catch (e) {}
+    }
+    if (typeof window.renderHome === 'function') window.renderHome();
+    if (typeof window.renderSB === 'function') window.renderSB();
+    window.toast && window.toast('מצב צפייה: ' + userName + ' (read-only)', '');
+  };
+
+  ADMIN.exitViewAs = function () {
+    const banner = document.getElementById('admin-view-banner');
+    if (banner) banner.style.display = 'none';
+    // חזרה לפאנל ה-admin
+    if (typeof window.initAdmin === 'function') window.initAdmin(_profile);
+    window.toast && window.toast('חזרת לפאנל Super Admin', 'ok');
+  };
 
   // ===== הזמנות =====
   async function loadInvitations(companyId) {

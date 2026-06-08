@@ -98,6 +98,7 @@ function goCurProj() { if (S.curProjId) goProj(S.curProjId); }
 window.goHome = goHome; window.goProj = goProj; window.goCurProj = goCurProj;
 
 // ===== SIDEBAR =====
+window.renderSB = renderSB;
 function renderSB() {
   document.getElementById('sb-projs').innerHTML = S.projects.map(p =>
     `<div class="sb-proj ${p.id === S.curProjId ? 'on' : ''}" onclick="goProj('${p.id}')">
@@ -105,6 +106,7 @@ function renderSB() {
 }
 
 // ===== HOME =====
+window.renderHome = renderHome;
 function renderHome() {
   const el = document.getElementById('home-c');
   if (!S.projects.length) {
@@ -475,12 +477,80 @@ window.applySig = function () {
 window.doPDF = async function () {
   autoSave();
   const p = getProj(S.curProjId);
-  const name = (p ? p.name + '_' : '') + (getType(CUR.typeId) || {}).name + '_' + new Date().toISOString().slice(0, 10);
-  const docNum = (CUR && CUR.docNum) || '001';
+  const pdfName = (p ? p.name + '_' : '') + (getType(CUR.typeId) || {}).name + '_' + new Date().toISOString().slice(0, 10);
   if (IS_EL) {
-    const r = await window.qcAPI.exportPDF({ defaultName: name, docNum });
+    const docNum = (CUR && CUR.docNum) || '001';
+    const r = await window.qcAPI.exportPDF({ defaultName: pdfName, docNum });
     if (r.ok) toast('PDF נשמר: ' + r.path, 'ok'); else if (r.error) toast('שגיאה: ' + r.error, 'err');
-  } else window.print();
+    return;
+  }
+  // Web: html2canvas → jsPDF
+  if (!window.html2canvas || !window.jspdf) { window.print(); return; }
+  const sheet = document.getElementById('sheet');
+  if (!sheet) return;
+
+  toast('🖨️ מייצר PDF באיכות גבוהה…', '');
+
+  // --- הסתרת אלמנטי ממשק לפני צילום ---
+  document.body.classList.add('pdf-exporting');
+  // המתן שה-CSS ייכנס לתוקף
+  await new Promise(r => setTimeout(r, 60));
+
+  try {
+    const canvas = await window.html2canvas(sheet, {
+      scale: 2,                    // רזולוציה כפולה → חדות גבוהה
+      useCORS: true,
+      allowTaint: false,
+      backgroundColor: '#ffffff',
+      logging: false,
+      imageTimeout: 15000,
+      scrollX: 0, scrollY: -window.scrollY,
+      windowWidth: sheet.scrollWidth + 80,
+    });
+
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4', compress: true });
+
+    const pageW = 210, pageH = 297;
+    const marginX = 10, marginY = 10;
+    const contentW = pageW - marginX * 2;
+    const contentH = pageH - marginY * 2;
+
+    // כמה פיקסלים של קנבס = עמוד אחד בגובה
+    const pxPerMm = canvas.width / contentW;
+    const pageHeightPx = contentH * pxPerMm;
+
+    const totalPages = Math.ceil(canvas.height / pageHeightPx);
+
+    for (let pg = 0; pg < totalPages; pg++) {
+      if (pg > 0) pdf.addPage();
+
+      const srcY  = Math.round(pg * pageHeightPx);
+      const srcH  = Math.min(Math.round(pageHeightPx), canvas.height - srcY);
+      const sliceH_mm = srcH / pxPerMm;
+
+      // חתוך פרוסה מהקנבס
+      const slice = document.createElement('canvas');
+      slice.width  = canvas.width;
+      slice.height = srcH;
+      const ctx = slice.getContext('2d');
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, slice.width, slice.height);
+      ctx.drawImage(canvas, 0, srcY, canvas.width, srcH, 0, 0, canvas.width, srcH);
+
+      pdf.addImage(slice.toDataURL('image/jpeg', 0.95), 'JPEG',
+        marginX, marginY, contentW, sliceH_mm, '', 'FAST');
+    }
+
+    pdf.save(pdfName + '.pdf');
+    toast('✅ PDF יוצר בהצלחה!', 'ok');
+  } catch (e) {
+    console.error('PDF export error:', e);
+    toast('שגיאה ביצירת PDF — מנסה הדפסה רגילה', 'err');
+    window.print();
+  } finally {
+    document.body.classList.remove('pdf-exporting');
+  }
 };
 
 // ===== SAVE / LOAD REPORT FILES =====

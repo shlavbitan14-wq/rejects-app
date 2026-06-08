@@ -141,6 +141,17 @@
     if (!prof) { companyView(); return; }
     if (prof.role !== 'super_admin' && !prof.company_id) { companyView(); return; }
 
+    // ---- אכיפת רישיון (לא רלוונטי ל-super_admin) ----
+    if (prof.role !== 'super_admin' && prof.company_id) {
+      const { data: lic } = await window.sb
+        .from('licenses').select('status, plan, expires_at').eq('company_id', prof.company_id).maybeSingle();
+      if (lic) {
+        const expired = lic.expires_at && new Date(lic.expires_at) < new Date();
+        if (lic.status === 'suspended') { show(licBlockedHtml('suspended')); return; }
+        if (expired || lic.status === 'expired') { show(licBlockedHtml('expired')); return; }
+      }
+    }
+
     const profile = {
       id: user.id, company_id: prof.company_id, role: prof.role,
       full_name: prof.full_name || (user.user_metadata && user.user_metadata.full_name) || '',
@@ -174,10 +185,24 @@
       <p class="auth-note">שלחנו קישור אישור אל <b>${email}</b>. אשר אותו וחזור להתחבר.</p>
       <button class="auth-btn" onclick="AUTH.loginView()">חזרה להתחברות</button>`;
   }
+  function licBlockedHtml(reason) {
+    const isExp = reason === 'expired';
+    return `
+      <div class="auth-brand">דוחות <em>מקצועיים</em></div>
+      <div class="auth-sub" style="color:var(--err)">${isExp ? '⏰ הרישיון פג תוקף' : '🔒 החשבון מושעה'}</div>
+      <p class="auth-note" style="margin-top:10px">
+        ${isExp
+          ? 'תוקף הרישיון של החברה שלך פג. <br>אנא צור קשר עם מנהל המערכת לחידוש.'
+          : 'גישת החברה שלך הושעתה. <br>אנא צור קשר עם מנהל המערכת.'}
+      </p>
+      <button class="auth-btn" style="background:#6e6e73;margin-top:4px" onclick="AUTH.signOut()">התנתק</button>`;
+  }
+
   function translate(m) {
     if (/Invalid login/i.test(m)) return 'אימייל או סיסמה שגויים';
     if (/already registered/i.test(m)) return 'האימייל כבר רשום — נסה להתחבר';
     if (/Email not confirmed/i.test(m)) return 'יש לאשר את המייל לפני התחברות';
+    if (/rate limit/i.test(m)) return 'יותר מדי ניסיונות — נסה שוב עוד כמה דקות';
     return m;
   }
 

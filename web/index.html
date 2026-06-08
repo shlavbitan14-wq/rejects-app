@@ -233,6 +233,20 @@
   </div>
 </div>
 
+<!-- BANNER: Super Admin view-as mode -->
+<div id="admin-view-banner" style="display:none;position:fixed;top:0;left:0;right:0;z-index:800;background:#0071e3;color:#fff;padding:8px 16px;align-items:center;justify-content:space-between;font-size:13px;font-weight:600;gap:12px">
+  <span>🛡️ Super Admin — <span id="admin-view-banner-name"></span></span>
+  <button onclick="ADMIN.exitViewAs()" style="background:rgba(255,255,255,.2);border:none;color:#fff;padding:5px 12px;border-radius:20px;cursor:pointer;font-size:12px">✕ צא ממצב צפייה</button>
+</div>
+
+<!-- MODAL: View-As (בחירת משתמש לצפייה) -->
+<div class="overlay" id="mViewAs">
+  <div class="modal" style="max-width:440px">
+    <div class="modal-h"><span id="view-as-title">בחר משתמש לצפייה</span><button class="modal-x" onclick="document.getElementById('mViewAs').classList.remove('on')">✕</button></div>
+    <div class="modal-b" id="view-as-list" style="display:flex;flex-direction:column;gap:4px;padding:12px 16px"></div>
+  </div>
+</div>
+
 <!-- MODAL: Create Company (Super Admin) -->
 <div id="mCreateCompany">
   <div class="create-co-card">
@@ -269,6 +283,8 @@
 <script src="auth.js"></script>
 <script src="admin.js"></script>
 <script src="team.js"></script>
+<script src="vendor/html2canvas.min.js"></script>
+<script src="vendor/jspdf.umd.min.js"></script>
 <script src="data/domain.js"></script>
 <script src="blocks.js"></script>
 <script src="data/reportTypes.js"></script>
