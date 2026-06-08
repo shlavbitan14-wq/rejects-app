@@ -7,6 +7,7 @@
 <title>מערכת דוחות מקצועית — בנייה וחשמל</title>
 <link rel="stylesheet" href="styles.css">
 <link rel="stylesheet" href="auth.css">
+<link rel="stylesheet" href="admin.css">
 </head>
 <body>
 <div id="app">
@@ -20,6 +21,8 @@
     <div class="sb-nav">
       <div class="sb-sec">תפריט</div>
       <div class="nav-i on" id="nav-home" onclick="goHome()"><span class="ico">🏠</span><span>פרויקטים</span></div>
+      <div class="nav-i" id="nav-team" style="display:none" onclick="TEAM.open()"><span class="ico">👥</span><span>צוות</span></div>
+      <div class="nav-i" id="nav-admin" style="display:none" onclick="window.initAdmin && window.initAdmin(window.CLOUD.profile)"><span class="ico">🛡️</span><span>Super Admin</span></div>
     </div>
     <div class="sb-sec" style="padding:6px 16px 3px;">פרויקטים</div>
     <div class="sb-projs" id="sb-projs"></div>
@@ -156,6 +159,12 @@
       </div>
     </div>
 
+    <!-- VIEW: SUPER ADMIN -->
+    <div class="view" id="vAdmin"></div>
+
+    <!-- VIEW: TEAM MANAGER -->
+    <div class="view" id="vTeam"></div>
+
   </div><!-- /main -->
 </div><!-- /app -->
 
@@ -224,6 +233,30 @@
   </div>
 </div>
 
+<!-- MODAL: Create Company (Super Admin) -->
+<div id="mCreateCompany">
+  <div class="create-co-card">
+    <div class="create-co-title">＋ חברה חדשה</div>
+    <div class="create-co-grid">
+      <div class="fld full"><label>שם החברה *</label><input type="text" id="nc-name" placeholder="שם החברה / הלקוח"></div>
+      <div class="fld"><label>תוכנית</label>
+        <select id="nc-plan">
+          <option value="trial">Trial</option>
+          <option value="starter">Starter</option>
+          <option value="pro">Pro</option>
+          <option value="enterprise">Enterprise</option>
+        </select>
+      </div>
+      <div class="fld"><label>מקס׳ מהנדסים</label><input type="number" id="nc-maxeng" value="5" min="1"></div>
+      <div class="fld full"><label>תפוגה (אופציונלי)</label><input type="date" id="nc-expires"></div>
+    </div>
+    <div class="create-co-footer">
+      <button class="btn btn-o" onclick="document.getElementById('mCreateCompany').classList.remove('on')">ביטול</button>
+      <button class="btn btn-p" id="nc-go" onclick="ADMIN.doCreateCompany()">צור חברה</button>
+    </div>
+  </div>
+</div>
+
 <div class="toasts" id="toasts"></div>
 <input type="file" id="logoInput" accept="image/*" style="display:none">
 <input type="file" id="photoInput" accept="image/*" style="display:none">
@@ -234,6 +267,8 @@
 <script src="supabase-config.js"></script>
 <script src="cloud.js"></script>
 <script src="auth.js"></script>
+<script src="admin.js"></script>
+<script src="team.js"></script>
 <script src="data/domain.js"></script>
 <script src="blocks.js"></script>
 <script src="data/reportTypes.js"></script>

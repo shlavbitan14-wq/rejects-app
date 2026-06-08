@@ -37,6 +37,10 @@ window.renderUserChip = function (profile) {
       <div class="user-role">${esc(roleLbl)}</div>
     </div>
     <button class="user-out" title="התנתקות" onclick="AUTH.signOut()">⎋</button>`;
+  const navTeam = document.getElementById('nav-team');
+  const navAdmin = document.getElementById('nav-admin');
+  if (navTeam) navTeam.style.display = (profile.role === 'manager') ? 'flex' : 'none';
+  if (navAdmin) navAdmin.style.display = (profile.role === 'super_admin') ? 'flex' : 'none';
 };
 
 // ===== DB (פרויקטים) =====
@@ -414,10 +418,11 @@ function onPhotoPicked(e) {
   rd.onload = ev => {
     const tmp = new Image();
     tmp.onload = () => {
-      const max = 800, sc = Math.min(1, max / Math.max(tmp.width, tmp.height));
+      const max = 1800, sc = Math.min(1, max / Math.max(tmp.width, tmp.height));
       const cv = document.createElement('canvas'); cv.width = Math.round(tmp.width * sc); cv.height = Math.round(tmp.height * sc);
-      cv.getContext('2d').drawImage(tmp, 0, 0, cv.width, cv.height);
-      const img = document.createElement('img'); img.src = cv.toDataURL('image/jpeg', 0.82);
+      const ctx2d = cv.getContext('2d'); ctx2d.imageSmoothingEnabled = true; ctx2d.imageSmoothingQuality = 'high';
+      ctx2d.drawImage(tmp, 0, 0, cv.width, cv.height);
+      const img = document.createElement('img'); img.src = cv.toDataURL('image/jpeg', 0.92);
       activePhotoBox.innerHTML = ''; activePhotoBox.appendChild(img); schedSave();
     };
     tmp.src = ev.target.result;

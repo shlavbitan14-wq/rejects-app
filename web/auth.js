@@ -121,9 +121,26 @@
   async function resolveProfile() {
     const { data: { user } } = await window.sb.auth.getUser();
     if (!user) { loginView(); return; }
+
+    // בדיקת קישור הזמנה בכתובת ה-URL
+    const inviteToken = new URLSearchParams(window.location.search).get('invite');
+    if (inviteToken) {
+      const { error: invErr } = await window.sb.rpc('accept_invitation', { p_token: inviteToken });
+      if (!invErr) {
+        // נקה את הפרמטר מהכתובת
+        const url = new URL(window.location.href);
+        url.searchParams.delete('invite');
+        window.history.replaceState({}, '', url.toString());
+      }
+    }
+
     const { data: prof } = await window.sb
       .from('profiles').select('id, company_id, role, full_name, email').eq('id', user.id).maybeSingle();
-    if (!prof || !prof.company_id) { companyView(); return; }
+
+    // super_admin לא חייב להיות קשור לחברה
+    if (!prof) { companyView(); return; }
+    if (prof.role !== 'super_admin' && !prof.company_id) { companyView(); return; }
+
     const profile = {
       id: user.id, company_id: prof.company_id, role: prof.role,
       full_name: prof.full_name || (user.user_metadata && user.user_metadata.full_name) || '',
@@ -131,7 +148,13 @@
     };
     window.CLOUD.setSession(profile);
     hide();
-    if (typeof window.init === 'function') window.init();
+
+    if (profile.role === 'super_admin') {
+      if (typeof window.initAdmin === 'function') window.initAdmin(profile);
+      else if (typeof window.init === 'function') window.init();
+    } else {
+      if (typeof window.init === 'function') window.init();
+    }
     if (typeof window.renderUserChip === 'function') window.renderUserChip(profile);
   }
 
@@ -139,6 +162,9 @@
   AUTH.start = async function () {
     if (!window.sb) { show('<div class="auth-sub">שגיאת חיבור ל-Supabase</div>'); return; }
     const { data: { session } } = await window.sb.auth.getSession();
+    // אם יש קישור הזמנה אבל אין session — הצג הרשמה
+    const inviteToken = new URLSearchParams(window.location.search).get('invite');
+    if (!session && inviteToken) { signupView(); return; }
     if (session) resolveProfile(); else loginView();
   };
 

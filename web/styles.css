@@ -443,9 +443,11 @@ body{
   .item{ background:#fff!important; border:1pt solid var(--g2)!important; border-inline-start-width:3pt!important; padding:9pt!important; page-break-inside:avoid!important; break-inside:avoid!important; }
   .defects-list{ gap:9pt!important; }
   .photo-col{ flex:0 0 52mm!important; }
-  .pbox{ width:52mm!important; height:44mm!important; }
+  .pbox{ width:52mm!important; height:44mm!important; overflow:hidden!important; }
+  .pbox img{ width:100%!important; height:100%!important; object-fit:contain!important; image-rendering:-webkit-optimize-contrast; image-rendering:crisp-edges; }
   .pbox .ph{ display:none!important; }
   .pwrap{ gap:5pt!important; }
+  .file-chip img{ width:28pt!important; height:28pt!important; object-fit:contain!important; image-rendering:-webkit-optimize-contrast; }
 
   /* --- טבלאות --- */
   .mtable{ font-size:9pt!important; }
