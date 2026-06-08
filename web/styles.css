@@ -397,21 +397,102 @@ body{
   .pwrap{flex-direction:column;}
 }
 
+/* no-print-faint: גלוי במסך, מעומעם קלות בהדפסה */
+.no-print-faint{}
+
 /* ===== PRINT ===== */
 @media print{
-  #sb,.r-toolbar,.r-panel,.no-print,.topbar,.block-ctl,.add-row,.pact,.sig-acts,.rdel,.meta-x,.rowx,.btn-add,.mobile-actionbar,#drawer-bd{display:none!important;}
-  .srow{display:none!important;}
-  body,html{height:auto;overflow:visible;background:#fff;}
-  #app,#main,.view,#vr,.r-workspace,.r-scroll{display:block!important;overflow:visible!important;position:static!important;}
-  .view.on{animation:none!important;}
-  .r-scroll{padding:0!important;background:#fff!important;}
-  .sheet{box-shadow:none!important;border-radius:0!important;max-width:100%!important;margin:0!important;padding:6mm 4mm!important;}
-  .item{background:#fff!important;}
-  .mval,.meta-val,.meta-label{background:none!important;}
-  *{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
-  .item,.sig-section,tr,.thermo-item{page-break-inside:avoid;}
-  thead{display:table-header-group;}
-  .sec-head,.rlabel{page-break-after:avoid;}
-  .block{margin-bottom:11px;}
+  /* --- כיבוי ממשק --- */
+  #sb,.r-toolbar,.r-panel,.no-print,.topbar,.block-ctl,.add-row,
+  .pact,.sig-acts,.rdel,.meta-x,.rowx,.btn-add,.mobile-actionbar,
+  #drawer-bd,#authGate,.srow,.files-add,.file-x,#rejectFileInput,
+  .user-out{ display:none!important; }
+
+  /* --- צבע --- */
+  *{ -webkit-print-color-adjust:exact!important; print-color-adjust:exact!important; }
+
+  /* --- איפוס layout האפליקציה --- */
+  html,body{ height:auto!important; overflow:visible!important; background:#fff!important; font-size:10pt; }
+  #app,#main{ display:block!important; height:auto!important; overflow:visible!important; }
+  .view.on{ display:block!important; overflow:visible!important; position:static!important; animation:none!important; }
+  .r-workspace,.r-scroll{ display:block!important; overflow:visible!important; position:static!important; background:#fff!important; padding:0!important; }
+
+  /* --- גיליון: ממלא עמוד A4 (שוליים מגיעים מ-@page) --- */
+  .sheet{
+    max-width:100%!important; width:100%!important;
+    margin:0!important; padding:0!important;
+    box-shadow:none!important; border-radius:0!important;
+    font-size:10pt;
+  }
+
+  /* --- כותרת מסמך --- */
+  .doc-head{ padding-bottom:9pt!important; margin-bottom:13pt!important; border-bottom-width:2pt!important; }
+  .logo-block img{ max-height:54pt!important; max-width:140pt!important; }
+  .logo-txt{ font-size:20pt!important; }
+  .logo-sub{ font-size:8pt!important; letter-spacing:1.5px!important; }
+  .meta-grid{ font-size:9pt!important; gap:3pt 12pt!important; }
+  .meta-grid b{ font-size:8pt!important; }
+
+  /* --- שדות קלט → טקסט נקי ללא גבולות --- */
+  .inp,.cell{ border:none!important; background:transparent!important; box-shadow:none!important; padding:1px 3px!important; }
+  .rbox{ border:none!important; border-right:2pt solid var(--accent)!important; background:transparent!important; box-shadow:none!important; padding:4pt 7pt!important; resize:none!important; }
+  .inp.sm{ padding:0 2px!important; }
+  textarea.rbox{ min-height:auto!important; }
+
+  /* --- ריג׳קט item --- */
+  .item{ background:#fff!important; border:1pt solid var(--g2)!important; border-inline-start-width:3pt!important; padding:9pt!important; page-break-inside:avoid!important; break-inside:avoid!important; }
+  .defects-list{ gap:9pt!important; }
+  .photo-col{ flex:0 0 52mm!important; }
+  .pbox{ width:52mm!important; height:44mm!important; }
+  .pbox .ph{ display:none!important; }
+  .pwrap{ gap:5pt!important; }
+
+  /* --- טבלאות --- */
+  .mtable{ font-size:9pt!important; }
+  .mtable th{ font-size:8.5pt!important; padding:5pt 7pt!important; }
+  .mtable td{ padding:4pt 6pt!important; }
+  .mtable select{ display:none!important; }
+
+  /* --- סיכום, חתימות --- */
+  .summary-box{ padding:9pt 12pt!important; }
+  .sum-stat{ font-size:9.5pt!important; }
+  .sum-stat b{ font-size:14pt!important; }
+  .sig-section{ gap:20pt!important; }
+  .sig-line{ height:70pt!important; }
+
+  /* --- שדות קלט בטבלאות --- */
+  .cell.num{ text-align:right; }
+  input[type=text],input[type=tel],input[type=number]{
+    border:none!important; background:transparent!important; -webkit-appearance:none; appearance:none;
+  }
+
+  /* --- ערכי meta --- */
+  .mval,.meta-val,.meta-label{ background:none!important; }
+  .statusbar{ display:flex!important; }
+  .no-print-faint{ font-size:8.5pt!important; color:var(--g3)!important; }
+
+  /* --- סטטוסבר + badge בהדפסה --- */
+  .badge{ padding:1pt 7pt!important; font-size:8pt!important; }
+
+  /* --- page-break control --- */
+  .item,.sig-section,tr,.thermo-item,.annex-item{ page-break-inside:avoid!important; break-inside:avoid!important; }
+  .sec-head,.rlabel,.doc-head{ page-break-after:avoid!important; break-after:avoid!important; }
+  thead{ display:table-header-group!important; }
+  .block{ margin-bottom:9pt!important; }
+
+  /* --- כותרת סעיף + פסקה --- */
+  .sec-head{ padding:3pt 9pt!important; margin:6pt 0 7pt!important; }
+  .sec-head-txt{ font-size:11pt!important; }
+  .doc-text{ font-size:10pt!important; line-height:1.6!important; }
+  .doc-legal{ padding:7pt 10pt!important; }
+  .doc-legal-txt{ font-size:8.5pt!important; }
+
+  /* --- כותרת דף A4 --- */
+  .doc-foot{ font-size:8pt!important; padding-top:7pt!important; margin-top:16pt!important; }
+
+  /* --- נספח תמונות --- */
+  .annex-grid{ grid-template-columns:1fr 1fr!important; gap:9pt!important; }
+  .annex-item .pbox{ width:100%!important; height:auto!important; aspect-ratio:4/3; }
 }
-@page{size:A4;margin:18mm 16mm 16mm 16mm;}
+
+@page{ size:A4; margin:18mm 15mm 16mm 15mm; }
