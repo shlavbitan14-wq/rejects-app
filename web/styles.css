@@ -534,14 +534,27 @@ body.pdf-exporting .sheet{
 body.pdf-exporting .inp,
 body.pdf-exporting .cell{ border:none!important; background:transparent!important; box-shadow:none!important; }
 body.pdf-exporting .rbox{ border:none!important; border-right:2pt solid var(--accent)!important; background:transparent!important; box-shadow:none!important; resize:none!important; }
-body.pdf-exporting .item{ background:#fff!important; border:1pt solid var(--g2)!important; border-inline-start-width:3pt!important; }
-body.pdf-exporting .pbox img{ object-fit:contain!important; }
-body.pdf-exporting .badge{ padding:1pt 7pt!important; font-size:8pt!important; }
+body.pdf-exporting .item{ background:#fff!important; border:1px solid var(--g2)!important; border-inline-start-width:3px!important; }
+body.pdf-exporting .badge{ font-size:11px!important; }
+
+/* --- תמונות: גדלים מחושבים ל-1240px ≈ A4 (52mm→340px, 44mm→287px) --- */
+body.pdf-exporting .photo-col{ flex:0 0 340px!important; }
+body.pdf-exporting .pbox{ width:340px!important; height:287px!important; overflow:hidden!important; }
+body.pdf-exporting .pbox img{ width:100%!important; height:100%!important; object-fit:contain!important; }
+body.pdf-exporting .pbox .ph{ display:none!important; }
+body.pdf-exporting .pwrap{ gap:8px!important; }
+/* נספח תמונות: 2 עמודות */
+body.pdf-exporting .annex-grid{ display:grid!important; grid-template-columns:1fr 1fr!important; gap:12px!important; }
+body.pdf-exporting .annex-item .pbox{ width:100%!important; height:auto!important; aspect-ratio:4/3!important; }
 body.pdf-exporting input[type=text],
 body.pdf-exporting input[type=tel],
 body.pdf-exporting input[type=number]{ border:none!important; background:transparent!important; }
 body.pdf-exporting .mval,
 body.pdf-exporting .meta-val,
 body.pdf-exporting .meta-label{ background:none!important; }
-body.pdf-exporting .r-workspace{ overflow:visible!important; display:block!important; }
-body.pdf-exporting .r-scroll{ overflow:visible!important; position:static!important; background:#fff!important; }
+body.pdf-exporting #main{ display:block!important; height:auto!important; overflow:visible!important; }
+body.pdf-exporting .view.on{ display:block!important; position:static!important; overflow:visible!important; animation:none!important; }
+body.pdf-exporting .r-workspace{ overflow:visible!important; display:block!important; height:auto!important; }
+body.pdf-exporting .r-scroll{ overflow:visible!important; position:static!important; background:#fff!important; height:auto!important; padding:0!important; }
+body.pdf-exporting html,
+body.pdf-exporting body{ height:auto!important; overflow:visible!important; }

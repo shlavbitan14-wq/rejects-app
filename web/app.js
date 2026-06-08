@@ -484,74 +484,137 @@ window.doPDF = async function () {
     if (r.ok) toast('PDF נשמר: ' + r.path, 'ok'); else if (r.error) toast('שגיאה: ' + r.error, 'err');
     return;
   }
-  // Web: html2canvas → jsPDF
   if (!window.html2canvas || !window.jspdf) { window.print(); return; }
   const sheet = document.getElementById('sheet');
   if (!sheet) return;
 
-  toast('🖨️ מייצר PDF באיכות גבוהה…', '');
+  toast('🖨️ מייצר PDF — רגע…', '');
 
-  // --- הסתרת אלמנטי ממשק לפני צילום ---
+  // 1. הסתר ממשק
   document.body.classList.add('pdf-exporting');
-  // המתן שה-CSS ייכנס לתוקף
-  await new Promise(r => setTimeout(r, 60));
+
+  // 2. כפה רוחב A4 מדויק לפני הצילום (1240px ≈ A4 ב-150dpi)
+  const A4_PX = 1240;
+  const prevStyle = sheet.getAttribute('style') || '';
+  sheet.style.cssText = prevStyle +
+    `;width:${A4_PX}px!important;max-width:${A4_PX}px!important;min-width:${A4_PX}px!important;`;
+
+  await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r))); // 2 frames לריפלו
 
   try {
+    const SCALE = 2; // 2480px canvas ≈ A4 ב-300dpi
+
+    // 3. צלם את העיצוב (פריסה, טקסט, צבעים, מסגרות)
     const canvas = await window.html2canvas(sheet, {
-      scale: 2,                    // רזולוציה כפולה → חדות גבוהה
+      scale: SCALE,
       useCORS: true,
       allowTaint: false,
       backgroundColor: '#ffffff',
       logging: false,
-      imageTimeout: 15000,
-      scrollX: 0, scrollY: -window.scrollY,
-      windowWidth: sheet.scrollWidth + 80,
+      imageTimeout: 20000,
+      scrollX: 0, scrollY: 0,
+      width: A4_PX,
+      height: sheet.scrollHeight,
+      windowWidth: A4_PX,
     });
 
+    // 4. הדבק תמונות מקוריות (base64) ישירות על הקנבס ברזולוציה מלאה
+    //    html2canvas מצלם תמונות בגודל CSS — אנחנו מחליפים בגרסת המקור.
+    await _stampNativeImages(canvas, sheet, SCALE);
+
+    // 5. בנה PDF עמוד-עמוד
     const { jsPDF } = window.jspdf;
     const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4', compress: true });
 
     const pageW = 210, pageH = 297;
-    const marginX = 10, marginY = 10;
-    const contentW = pageW - marginX * 2;
-    const contentH = pageH - marginY * 2;
+    const mX = 10, mY = 12;                // שוליים מינימליים
+    const cW = pageW - mX * 2;             // 190mm רוחב תוכן
+    const cH = pageH - mY * 2;             // 273mm גובה תוכן לעמוד
 
-    // כמה פיקסלים של קנבס = עמוד אחד בגובה
-    const pxPerMm = canvas.width / contentW;
-    const pageHeightPx = contentH * pxPerMm;
+    const pxPerMm   = canvas.width / cW;   // פיקסלים לmm
+    const pgHeightPx = cH * pxPerMm;       // גובה עמוד בפיקסלים
 
-    const totalPages = Math.ceil(canvas.height / pageHeightPx);
+    const totalPg = Math.ceil(canvas.height / pgHeightPx);
 
-    for (let pg = 0; pg < totalPages; pg++) {
+    for (let pg = 0; pg < totalPg; pg++) {
       if (pg > 0) pdf.addPage();
 
-      const srcY  = Math.round(pg * pageHeightPx);
-      const srcH  = Math.min(Math.round(pageHeightPx), canvas.height - srcY);
-      const sliceH_mm = srcH / pxPerMm;
+      const srcY = Math.round(pg * pgHeightPx);
+      const srcH = Math.min(Math.round(pgHeightPx), canvas.height - srcY);
+      const sliceMm = srcH / pxPerMm;
 
-      // חתוך פרוסה מהקנבס
       const slice = document.createElement('canvas');
-      slice.width  = canvas.width;
+      slice.width = canvas.width;
       slice.height = srcH;
-      const ctx = slice.getContext('2d');
-      ctx.fillStyle = '#ffffff';
-      ctx.fillRect(0, 0, slice.width, slice.height);
-      ctx.drawImage(canvas, 0, srcY, canvas.width, srcH, 0, 0, canvas.width, srcH);
+      const sCtx = slice.getContext('2d');
+      sCtx.fillStyle = '#ffffff';
+      sCtx.fillRect(0, 0, slice.width, slice.height);
+      sCtx.drawImage(canvas, 0, srcY, canvas.width, srcH, 0, 0, canvas.width, srcH);
 
-      pdf.addImage(slice.toDataURL('image/jpeg', 0.95), 'JPEG',
-        marginX, marginY, contentW, sliceH_mm, '', 'FAST');
+      // JPEG 0.97 — גבוה מאד לשמירת איכות תמונות
+      pdf.addImage(slice.toDataURL('image/jpeg', 0.97), 'JPEG', mX, mY, cW, sliceMm, '', 'FAST');
     }
 
     pdf.save(pdfName + '.pdf');
     toast('✅ PDF יוצר בהצלחה!', 'ok');
   } catch (e) {
-    console.error('PDF export error:', e);
+    console.error('[PDF]', e);
     toast('שגיאה ביצירת PDF — מנסה הדפסה רגילה', 'err');
     window.print();
   } finally {
+    // שחזר מידות מקוריות
+    if (prevStyle) sheet.setAttribute('style', prevStyle);
+    else sheet.removeAttribute('style');
     document.body.classList.remove('pdf-exporting');
   }
 };
+
+// --- עוזר פנימי: החלפת תמונות CSS בגרסאות full-res על הקנבס ---
+async function _stampNativeImages(canvas, sheet, scale) {
+  const ctx = canvas.getContext('2d');
+  const sr = sheet.getBoundingClientRect(); // מיקום sheet על המסך
+
+  // כל התמונות שרוצים להדביק מחדש ברזולוציה מקורית
+  const selectors = '.pbox img, .file-chip img, #logoPrev img, .sig-line img';
+  const imgs = [...sheet.querySelectorAll(selectors)];
+
+  for (const img of imgs) {
+    const src = img.src || '';
+    // רק data-URLs (base64 מהדיסק/הזיכרון) — לא חיצוניים
+    if (!src.startsWith('data:')) continue;
+
+    const ir = img.getBoundingClientRect();
+    const rx = Math.round((ir.left - sr.left) * scale);
+    const ry = Math.round((ir.top  - sr.top)  * scale);
+    const rw = Math.round(ir.width  * scale);
+    const rh = Math.round(ir.height * scale);
+    if (rw <= 4 || rh <= 4) continue;
+
+    // טען את התמונה המלאה
+    const full = await _loadImage(src);
+    if (!full || !full.naturalWidth) continue;
+
+    // ריק לבן לבקס
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(rx, ry, rw, rh);
+
+    // object-fit: contain — שמור על יחס גובה-רוחב
+    const nA = full.naturalWidth / full.naturalHeight;
+    const bA = rw / rh;
+    let dw, dh, dx, dy;
+    if (nA > bA) { dw = rw; dh = rw / nA; dx = rx; dy = ry + (rh - dh) / 2; }
+    else         { dh = rh; dw = rh * nA; dy = ry; dx = rx + (rw - dw) / 2; }
+
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+    ctx.drawImage(full, dx, dy, dw, dh);
+  }
+}
+function _loadImage(src) {
+  return new Promise(res => {
+    const i = new Image(); i.onload = () => res(i); i.onerror = () => res(null); i.src = src;
+  });
+}
 
 // ===== SAVE / LOAD REPORT FILES =====
 window.saveRptFile = async function () {
