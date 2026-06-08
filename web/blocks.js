@@ -108,41 +108,69 @@
     collect: (el) => ({ text: txt(el, '.doc-legal-txt') })
   };
 
-  /* ===== defects — רשימת רג'קטים / ליקויים ===== */
+  /* ===== defects — רשימת רג'קטים / ליקויים (כרטיס פרמיום) ===== */
   function defectItem(it, n) {
     it = it || {};
-    const trades = (D.TRADES || []).map(t => `<option value="${esc(t)}">`).join('');
-    return `<div class="item" data-id="${uid('it')}">
-      <div class="num">${n}</div>
-      <div class="photo-col">
-        <div class="pwrap">${photoBox(it.photo, 'לפני')}${photoActs()}</div>
-        <div class="pwrap" style="margin-top:6px">${photoBox(it.photoAfter, 'אחרי (אופ׳)')}${photoActs()}</div>
+    const sev = it.severity || 'med';
+    const sevCls = { low: 'sev-low', med: 'sev-med', high: 'sev-high', crit: 'sev-high' }[sev] || 'sev-med';
+    const statDef = (D.STATUS || []).find(s => s.key === (it.status || 'open')) || { label: 'פתוח', cls: 'badge-open' };
+    const sevDef  = (D.SEVERITY || []).find(s => s.key === sev) || { label: '' };
+    return `<div class="item ${sevCls}" data-id="${uid('it')}">
+      <div class="item-head">
+        <div class="item-num">${n}</div>
+        <div class="item-locs">
+          ${inp('inp f-loc item-loc', it.loc, 'מיקום — קומה / חדר / אזור')}
+          <input class="inp f-dom item-dom" list="trades-dl" value="${esc(it.dom || '')}" placeholder="תחום עבודה" oninput="schedSave()">
+        </div>
+        <div class="item-badges">
+          <span class="badge ${statDef.cls} s-badge">${esc(statDef.label)}</span>
+        </div>
       </div>
-      <div class="info-col">
-        <div class="frow"><label>מיקום</label>${inp('inp f-loc', it.loc, 'קומה / חדר / מיקום')}</div>
-        <div class="frow"><label>תחום</label><input class="inp f-dom" list="trades-dl" value="${esc(it.dom || '')}" placeholder="בחר תחום" oninput="schedSave()"></div>
-        <div class="rlabel">תיאור הליקוי:</div>
-        <textarea class="rbox f-desc" placeholder="תיאור מדויק — מה, איפה, מידה, ומה נדרש לתיקון..." oninput="schedSave()">${esc(it.desc || '')}</textarea>
-        <div class="tline no-print-faint">
-          <span>תקן/סעיף</span>${inp('inp sm f-std', it.std, 'ת"י 789...')}
-          <span>סטייה מותרת</span>${inp('inp sm f-tol', it.tol, '')}
-          <span>נמדד</span>${inp('inp sm f-meas', it.measured, '')}
+      <div class="item-photos">
+        <div class="photo-slot pwrap-a">
+          <span class="pslot-lbl">לפני</span>
+          <div class="pwrap">${photoBox(it.photo, 'תמונה לפני')}${photoActs()}</div>
         </div>
-        <div class="tline">
-          <span>אחראי</span>${inp('inp sm f-resp', it.resp, 'קבלן / ספק')}
-          <span>יעד לתיקון</span>${inp('inp sm f-due', it.due, 'תאריך')}
+        <div class="photo-slot pwrap-b">
+          <span class="pslot-lbl">אחרי (אופ׳)</span>
+          <div class="pwrap">${photoBox(it.photoAfter, 'תמונה אחרי')}${photoActs()}</div>
         </div>
-        ${filesRow(it.files)}
-        <div class="statusbar">
-          <span class="sev-tag">חומרה: <b>${esc((D.SEVERITY.find(s => s.key === (it.severity || 'med')) || {}).label || '')}</b></span>
-          <span class="badge ${(D.STATUS.find(s => s.key === (it.status || 'open')) || {}).cls}">${esc((D.STATUS.find(s => s.key === (it.status || 'open')) || {}).label || '')}</span>
+      </div>
+      <div class="item-grid">
+        <div class="item-fld">
+          <span class="item-lbl">אחראי לתיקון</span>
+          ${inp('inp f-resp', it.resp, 'קבלן / ספק')}
         </div>
-        <div class="srow no-print">
-          <span>חומרה:</span>${sel('f-sev', D.SEVERITY, it.severity || 'med', 'setSev(this);schedSave()')}
+        <div class="item-fld">
+          <span class="item-lbl">יעד לתיקון</span>
+          ${inp('inp f-due', it.due, 'תאריך')}
+        </div>
+        <div class="item-fld">
+          <span class="item-lbl">תקן / סעיף</span>
+          ${inp('inp f-std', it.std, 'ת"י / IS ...')}
+        </div>
+        <div class="item-fld">
+          <span class="item-lbl">ערך נמדד</span>
+          ${inp('inp f-meas', it.measured, 'מידה / ממצא')}
+        </div>
+      </div>
+      <div class="item-desc-wrap">
+        <span class="item-lbl">תיאור הליקוי</span>
+        <textarea class="rbox f-desc" placeholder="תיאור מדויק — מה, איפה, מה נדרש לתיקון..." oninput="schedSave()">${esc(it.desc || '')}</textarea>
+      </div>
+      ${filesRow(it.files)}
+      <div class="statusbar">
+        <span class="sev-tag">חומרה: <b>${esc(sevDef.label)}</b></span>
+        <span class="badge ${statDef.cls}">${esc(statDef.label)}</span>
+      </div>
+      <div class="item-foot no-print">
+        <div class="item-ctrl">
+          <span>חומרה:</span>${sel('f-sev', D.SEVERITY, sev, 'setSev(this);schedSave()')}
           <span>סטטוס:</span>${sel('f-status', D.STATUS, it.status || 'open', 'setStat(this);schedSave()')}
-          <button class="rdel" onclick="delDefect(this)">הסר</button>
         </div>
-      </div></div>`;
+        <button class="rdel" onclick="delDefect(this)">הסר</button>
+      </div>
+    </div>`;
   }
   BLOCKS.defects = {
     label: 'רשימת רג׳קטים',
@@ -155,13 +183,13 @@
     },
     collect(el) {
       const items = [];
-      el.querySelectorAll('.item').forEach(it => items.push({
+      el.querySelectorAll('.item:not(.thermo-item)').forEach(it => items.push({
         loc: ival(it, '.f-loc'), dom: ival(it, '.f-dom'), desc: (it.querySelector('.f-desc') || {}).value || '',
-        std: ival(it, '.f-std'), tol: ival(it, '.f-tol'), measured: ival(it, '.f-meas'),
+        std: ival(it, '.f-std'), tol: '', measured: ival(it, '.f-meas'),
         resp: ival(it, '.f-resp'), due: ival(it, '.f-due'),
         severity: ival(it, '.f-sev'), status: ival(it, '.f-status'),
         files: collectFiles(it),
-        photo: imgSrc(it, '.pwrap:nth-child(1) .pbox'), photoAfter: imgSrc(it, '.pwrap:nth-child(2) .pbox')
+        photo: imgSrc(it, '.pwrap-a .pbox'), photoAfter: imgSrc(it, '.pwrap-b .pbox')
       }));
       return { items };
     }
@@ -452,7 +480,7 @@
     if (!confirm('להסיר פריט זה?')) return;
     const list = btn.closest('.defects-list'); btn.closest('.item').remove(); renumber(list); refreshAllSummaries(); schedSave();
   };
-  function renumber(list) { list && list.querySelectorAll('.item').forEach((it, i) => { const n = it.querySelector('.num'); if (n) n.textContent = i + 1; }); }
+  function renumber(list) { list && list.querySelectorAll('.item').forEach((it, i) => { const n = it.querySelector('.item-num') || it.querySelector('.num'); if (n) n.textContent = i + 1; }); }
   window.renumberDefects = function () { document.querySelectorAll('.defects-list').forEach(renumber); };
   window.addThermo = function (btn) {
     const list = btn.closest('.block-body').querySelector('.defects-list');
@@ -484,9 +512,13 @@
   };
   window.setStat = function (sel) {
     const item = sel.closest('.item');
-    const b = item ? item.querySelector('.statusbar .badge') : null;
     const s = (D.STATUS || []).find(x => x.key === sel.value) || { label: '', cls: '' };
+    // statusbar badge (print)
+    const b = item ? item.querySelector('.statusbar .badge') : null;
     if (b) { b.textContent = s.label; b.className = 'badge ' + s.cls; }
+    // header badge (screen)
+    const hb = item ? item.querySelector('.s-badge') : null;
+    if (hb) { hb.textContent = s.label; hb.className = 'badge ' + s.cls + ' s-badge'; }
     refreshAllSummaries();
   };
   window.setThermoSev = function (sel) {
